@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>PC MiClaw 对话流 UI 走查报告</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#F5F6F8;--c:#FFF;--bd:rgba(0,0,0,.06);--t1:rgba(0,0,0,.88);--t2:rgba(0,0,0,.55);--t3:rgba(0,0,0,.3);--blue:#3482FF;--bl:rgba(52,130,255,.07);--green:#34C759;--gl:rgba(52,199,89,.08);--red:#FF3B30;--rl:rgba(255,59,48,.07);--amber:#FF9F05;--al:rgba(255,159,5,.08);--r:14px;--f:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif}html,body{min-height:100%;background:var(--bg);font-family:var(--f);color:var(--t1);line-height:1.7;-webkit-font-smoothing:antialiased}.w{max-width:1140px;margin:0 auto;padding:48px 28px 100px}h1{font-size:24px;font-weight:700;margin-bottom:4px}.sub{font-size:13px;color:var(--t2);margin-bottom:28px}.row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:32px}.mc{flex:1;min-width:160px;background:var(--c);border-radius:var(--r);padding:16px 20px;border:1px solid var(--bd)}.mc .n{font-size:28px;font-weight:700;line-height:1.2}.mc .l{font-size:11px;color:var(--t2);margin-top:2px}.cg .n{color:var(--green)}.cr .n{color:var(--red)}.ca .n{color:var(--amber)}.cb .n{color:var(--blue)}h2{font-size:18px;font-weight:600;margin:36px 0 16px;padding-bottom:10px;border-bottom:1px solid var(--bd)}h3{font-size:14px;font-weight:600;margin:20px 0 10px;color:var(--t1)}.card{background:var(--c);border-radius:var(--r);border:1px solid var(--bd);margin-bottom:14px;overflow:hidden}.card-h{padding:14px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--bd)}.card-b{padding:16px 20px}table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;padding:8px 12px;background:rgba(0,0,0,.02);font-weight:600;font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bd)}td{padding:8px 12px;border-bottom:1px solid var(--bd);vertical-align:top}tr:last-child td{border-bottom:none}.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:500}.tg{background:var(--gl);color:var(--green)}.tr{background:var(--rl);color:var(--red)}.ta{background:var(--al);color:var(--amber)}.tb{background:var(--bl);color:var(--blue)}.note{font-size:12px;color:var(--t2);padding:12px 16px;background:rgba(0,0,0,.02);border-radius:8px;margin-top:10px;line-height:1.6}code{font-size:11.5px;background:rgba(0,0,0,.04);padding:1px 5px;border-radius:4px;font-family:'SF Mono','Fira Code',monospace}.figma{color:var(--blue);font-weight:500}.impl{color:var(--t2)}.gap{color:var(--red);font-weight:500}</style></head><body><div class="w">
+<h1>🔍 PC MiClaw 对话流 UI 走查报告</h1>
+<div class="sub">Figma 设计稿 (Miclaw Mac/Win · node 448-3749 · 集合) vs 工程 Demo 实现 · 2026-03-31</div>
+
+<div class="row">
+<div class="mc cb"><div class="n">12</div><div class="l">设计稿定义的组件场景</div></div>
+<div class="mc cg"><div class="n">5</div><div class="l">工程已覆盖</div></div>
+<div class="mc cr"><div class="n">7</div><div class="l">工程未覆盖 / 缺失</div></div>
+<div class="mc ca"><div class="n">14</div><div class="l">还原偏差项</div></div>
+</div>
+
+<h2>一、设计稿组件清单 vs 工程覆盖度</h2>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>序号</th><th>设计稿组件/场景</th><th>Figma 节点</th><th>工程覆盖</th><th>备注</th></tr>
+<tr><td>1</td><td>顶部导航栏（Logo + 标题 + 本地标签 + More按钮）</td><td>448:4411 / 448:4424 / 448:4429</td><td><span class="tag ta">部分</span></td><td>工程有侧边栏导航，但缺少顶部横向导航栏、"本地"标签、More按钮</td></tr>
+<tr><td>2</td><td>用户消息气泡（蓝底右对齐）</td><td>448:3752 等</td><td><span class="tag tg">已覆盖</span></td><td>基本还原，细节偏差见下方</td></tr>
+<tr><td>3</td><td>AI 回复头像 + 名称行</td><td>448:3759</td><td><span class="tag ta">部分</span></td><td>工程用字母头像，设计稿用品牌 Logo + "Miclaw" 文字</td></tr>
+<tr><td>4</td><td>思考过程 — 折叠态（思考完成）</td><td>448:4878 / 452:3587</td><td><span class="tag tg">已覆盖</span></td><td>结构一致，样式偏差</td></tr>
+<tr><td>5</td><td>思考过程 — 思考中（shimmer动画）</td><td>452:3678</td><td><span class="tag tg">已覆盖</span></td><td>工程有 shimmer，但文案和图标差异</td></tr>
+<tr><td>6</td><td>深度思考展开态（Think/Read/Recall/Tools/Build/Help）</td><td>448:5037 / 448:5120 / 448:5187 / 448:5306 / 448:5338 / 448:5370 / 448:5418</td><td><span class="tag tr">缺失</span></td><td>设计稿定义了6种思考子类型（🧠思考/🔍查阅/💭回忆/🚀执行/🛠构建/⚠异常），工程仅实现通用思考</td></tr>
+<tr><td>7</td><td>代码块（深色/浅色两种主题）</td><td>448:5393 / 448:3944 / 448:3953</td><td><span class="tag tr">缺失</span></td><td>设计稿有深色(#1E1F20)代码块+语言标签+复制按钮，以及浅色(#E7E7E7)终端块；工程未实现</td></tr>
+<tr><td>8</td><td>Markdown 排版（H1/H2/H3/正文/列表）</td><td>448:3826-3829</td><td><span class="tag ta">部分</span></td><td>工程有基础文本，但未按设计稿字号层级实现</td></tr>
+<tr><td>9</td><td>任务清单（Todo Checklist）</td><td>448:4295-4299</td><td><span class="tag tr">缺失</span></td><td>设计稿有完成/待办 checkbox 列表，工程未实现</td></tr>
+<tr><td>10</td><td>工具调用进度条（Read File / Write File / Execute Command）</td><td>448:4340-4371</td><td><span class="tag tr">缺失</span></td><td>设计稿有带图标的工具调用步骤指示器，工程未实现</td></tr>
+<tr><td>11</td><td>多列表格 / 对比表格</td><td>448:3878 / 448:3916</td><td><span class="tag tr">缺失</span></td><td>设计稿有两种表格样式（带边框圆角 / 无边框对比），工程未实现</td></tr>
+<tr><td>12</td><td>交互问答选择卡片</td><td>448:3966-3973</td><td><span class="tag tr">缺失</span></td><td>设计稿有方案A/B选择卡片（选中态蓝色边框），工程未实现</td></tr>
+<tr><td>13</td><td>图片消息（单图/多图）</td><td>448:3981-3996</td><td><span class="tag tr">缺失</span></td><td>设计稿有图片圆角卡片样式，工程未实现</td></tr>
+<tr><td>14</td><td>文件附件卡片（PDF/TXT等）</td><td>452:4455-4545</td><td><span class="tag tr">缺失</span></td><td>设计稿有文件类型图标+文件名+类型标签，工程未实现</td></tr>
+<tr><td>15</td><td>底部输入框</td><td>448:4375-4395</td><td><span class="tag tg">已覆盖</span></td><td>基本结构一致，细节差异</td></tr>
+<tr><td>16</td><td>消息操作栏（复制/点赞/点踩）</td><td>448:3785-3791</td><td><span class="tag tg">已覆盖</span></td><td>工程未实现 hover 态背景</td></tr>
+</table>
+</div></div>
+
+<h2>二、已覆盖组件的还原偏差（面向研发）</h2>
+
+<h3>2.1 字体与排版</h3>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>属性</th><th>Figma 设计稿</th><th>工程实现</th><th>严重度</th></tr>
+<tr><td>字体族</td><td class="figma">MiSans（全局）</td><td class="impl">Noto Sans SC / system-ui</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>AI名称字号</td><td class="figma">26px / weight 450</td><td class="impl">未显示名称文字</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>正文字号</td><td class="figma">21px / weight 330 / line-height 28px</td><td class="impl">13.5px / weight 400 / line-height 1.65</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>H1 标题</td><td class="figma">30px / weight 520 / line-height 40px</td><td class="impl">未实现 Markdown 标题层级</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>H2 标题</td><td class="figma">26px / weight 520 / line-height 34px</td><td class="impl">—</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>H3 标题</td><td class="figma">24px / weight 520 / line-height 32px</td><td class="impl">—</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>思考过程文字</td><td class="figma">20px / weight 380 / color rgba(0,0,0,0.4)</td><td class="impl">13.5px / weight 500 / color var(--text-primary)</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>用户消息字号</td><td class="figma">24px / weight 380 / line-height 32px</td><td class="impl">13.5px / weight 400</td><td><span class="tag ta">中</span></td></tr>
+</table>
+<div class="note">⚠️ 设计稿基于 2x 分辨率标注（2000px 画布宽度），工程实现需要除以约 1.5-2 倍换算为实际 CSS 像素。即使考虑缩放，当前工程字号仍偏小约 20-30%。建议研发按设计稿值 ÷ 1.5 作为基准。</div>
+</div></div>
+
+<h3>2.2 颜色与视觉</h3>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>元素</th><th>Figma 设计稿</th><th>工程实现</th><th>严重度</th></tr>
+<tr><td>用户消息气泡背景</td><td class="figma">#D1E3FF（浅蓝）</td><td class="impl">#2979FF（深蓝，白字）</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>用户消息文字色</td><td class="figma">#000000</td><td class="impl">#FFFFFF</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>用户消息圆角</td><td class="figma">26px</td><td class="impl">14px</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>思考过程背景</td><td class="figma">rgba(0,0,0,0.04) + 1px border rgba(0,0,0,0.06)</td><td class="impl">仅 1px border rgba(0,0,0,.06)，无背景填充</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>思考过程圆角</td><td class="figma">16px</td><td class="impl">14px</td><td><span class="tag tg">低</span></td></tr>
+<tr><td>AI 头像</td><td class="figma">48px 白底圆形 + 品牌 Logo</td><td class="impl">32px 渐变圆形 + 字母 "M"</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>深度思考展开态文字渐变</td><td class="figma">linear-gradient(90deg, #0F0F0F, #2A2A2A) 文字渐变</td><td class="impl">shimmer 动画（方向一致但颜色不同）</td><td><span class="tag tg">低</span></td></tr>
+<tr><td>代码块背景（深色）</td><td class="figma">#1E1F20 / 圆角 12-16px</td><td class="impl">未实现</td><td><span class="tag tr">高</span></td></tr>
+<tr><td>代码块背景（浅色/终端）</td><td class="figma">#E7E7E7 / 圆角 26px</td><td class="impl">未实现</td><td><span class="tag tr">高</span></td></tr>
+</table>
+</div></div>
+
+<h3>2.3 布局与间距</h3>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>元素</th><th>Figma 设计稿</th><th>工程实现</th><th>严重度</th></tr>
+<tr><td>消息区域内边距</td><td class="figma">左侧 389px 起（相对 2000px 画布 ≈ 19.5%）</td><td class="impl">padding: 24px 32px</td><td><span class="tag tg">低</span></td></tr>
+<tr><td>消息间距</td><td class="figma">32px（同一轮对话内 6px）</td><td class="impl">20px（统一）</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>思考过程内边距</td><td class="figma">20px</td><td class="impl">12px 16px</td><td><span class="tag tg">低</span></td></tr>
+<tr><td>思考步骤间距</td><td class="figma">12px</td><td class="impl">14px</td><td><span class="tag tg">低</span></td></tr>
+<tr><td>操作栏按钮尺寸</td><td class="figma">48×48px / 圆角 100px / 图标 28px</td><td class="impl">未明确定义 hover 区域</td><td><span class="tag ta">中</span></td></tr>
+<tr><td>输入框高度</td><td class="figma">210px（含功能区）/ 圆角 36px</td><td class="impl">40px / 圆角 20px</td><td><span class="tag ta">中</span></td></tr>
+</table>
+</div></div>
+
+<h2>三、设计稿覆盖度分析（面向设计师）</h2>
+<p style="font-size:13px;color:var(--t2);margin-bottom:16px">以下分析设计稿 (node 448-3749 "集合") 是否覆盖了对话流中所有可能出现的样式场景。</p>
+
+<h3>3.1 已覆盖的对话流场景</h3>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>场景</th><th>设计稿位置</th><th>完整度</th></tr>
+<tr><td>普通文本回复（纯文字长段落）</td><td>第1组对话 · Miclaw 分析</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>Markdown 排版（H1/H2/H3/正文/列表）</td><td>第2组对话 · Markdown格式</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>思考完成折叠态</td><td>多处复用 · 思考过程组件</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>思考中进行态</td><td>思考中...组件 (452:3678)</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Think（思考规划）</td><td>448:5120</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Read（查阅文档）</td><td>448:5187</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Recall（回忆记忆）</td><td>448:5306</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Tools（执行工具）</td><td>448:5338</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Build（构建Agent）</td><td>448:5370</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>深度思考展开 — Help（异常挂起）</td><td>448:5418</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>多步骤思考链（一次意图多节点）</td><td>第3组对话 · 思考状态区</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>代码块（深色 + 语言标签 + 复制按钮）</td><td>448:3944 / 448:5393</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>终端块（浅色 + 运行/停止控制）</td><td>448:3953</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>多列表格（带边框圆角）</td><td>448:3878</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>对比表格（无边框）</td><td>448:3916</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>交互问答选择卡片</td><td>448:3966-3973</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>任务清单 Checklist</td><td>448:4295-4299</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>工具调用进度条</td><td>448:4340-4371</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>图片消息（单图/多图）</td><td>448:3981-3996</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>文件附件卡片</td><td>452:4455-4545</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>消息操作栏（复制/分享/更多）</td><td>448:3785-3791</td><td><span class="tag tg">完整</span></td></tr>
+<tr><td>分割线</td><td>448:3874</td><td><span class="tag tg">完整</span></td></tr>
+</table>
+</div></div>
+
+<h3>3.2 设计稿缺失的对话流场景</h3>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>缺失场景</th><th>说明</th><th>优先级</th></tr>
+<tr><td>流式输出打字机效果</td><td>设计稿为静态截图，未定义文字逐字出现的动画节奏、光标样式</td><td><span class="tag tr">P0</span></td></tr>
+<tr><td>思考过程展开/折叠动画</td><td>设计稿仅有折叠态和展开态，未定义过渡动画时长、缓动曲线</td><td><span class="tag ta">P1</span></td></tr>
+<tr><td>消息加载骨架屏</td><td>AI 回复前的等待状态（非思考过程），如三点跳动等</td><td><span class="tag ta">P1</span></td></tr>
+<tr><td>长消息折叠 / "展开全文"</td><td>超长回复是否需要折叠？阈值是多少？</td><td><span class="tag ta">P1</span></td></tr>
+<tr><td>消息编辑/重新生成</td><td>用户消息编辑态、AI 重新生成按钮样式</td><td><span class="tag ta">P1</span></td></tr>
+<tr><td>网络异常/超时全局提示</td><td>非工具级别的全局网络错误提示样式</td><td><span class="tag ta">P1</span></td></tr>
+<tr><td>空状态（新对话首屏）</td><td>无历史消息时的引导/推荐问题样式</td><td><span class="tag tr">P0</span></td></tr>
+<tr><td>多轮对话分割</td><td>不同话题之间的视觉分隔方式</td><td><span class="tag tg">P2</span></td></tr>
+<tr><td>链接预览卡片</td><td>消息中包含 URL 时的预览卡片样式</td><td><span class="tag tg">P2</span></td></tr>
+<tr><td>LaTeX / 数学公式渲染</td><td>数学公式的渲染样式</td><td><span class="tag tg">P2</span></td></tr>
+<tr><td>引用回复（Quote）</td><td>引用之前消息的样式</td><td><span class="tag tg">P2</span></td></tr>
+<tr><td>Hover 态完整定义</td><td>设计稿标注了 "Hover态" 但未给出所有元素的 hover 变化</td><td><span class="tag ta">P1</span></td></tr>
+</table>
+</div></div>
+
+<h2>四、关键设计 Token 速查表</h2>
+<p style="font-size:13px;color:var(--t2);margin-bottom:16px">从 Figma 设计稿提取的核心设计变量，供研发直接使用。</p>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>Token</th><th>值</th><th>用途</th></tr>
+<tr><td><code>--font-family</code></td><td>MiSans</td><td>全局字体</td></tr>
+<tr><td><code>--font-icon</code></td><td>HyperOS Symbols VF</td><td>图标字体</td></tr>
+<tr><td><code>--color-user-bubble</code></td><td>#D1E3FF</td><td>用户消息气泡背景</td></tr>
+<tr><td><code>--color-user-text</code></td><td>#000000</td><td>用户消息文字</td></tr>
+<tr><td><code>--color-thinking-bg</code></td><td>rgba(0,0,0,0.04)</td><td>思考过程背景</td></tr>
+<tr><td><code>--color-thinking-border</code></td><td>rgba(0,0,0,0.06)</td><td>思考过程边框</td></tr>
+<tr><td><code>--color-thinking-text</code></td><td>rgba(0,0,0,0.4)</td><td>思考过程文字</td></tr>
+<tr><td><code>--color-code-dark</code></td><td>#1E1F20</td><td>深色代码块背景</td></tr>
+<tr><td><code>--color-code-light</code></td><td>#E7E7E7</td><td>浅色终端块背景</td></tr>
+<tr><td><code>--color-code-text</code></td><td>#7A7A7A</td><td>代码/终端文字</td></tr>
+<tr><td><code>--color-notice-bg</code></td><td>rgba(255,159,5,0.1)</td><td>"本地"标签背景</td></tr>
+<tr><td><code>--color-notice-text</code></td><td>#FF9F05</td><td>"本地"标签文字</td></tr>
+<tr><td><code>--color-divider</code></td><td>rgba(0,0,0,0.2)</td><td>分割线</td></tr>
+<tr><td><code>--radius-bubble</code></td><td>26px</td><td>消息气泡圆角</td></tr>
+<tr><td><code>--radius-thinking</code></td><td>16px</td><td>思考过程圆角</td></tr>
+<tr><td><code>--radius-code</code></td><td>12-26px</td><td>代码块圆角（内联12/独立26）</td></tr>
+<tr><td><code>--radius-table</code></td><td>18px</td><td>表格圆角</td></tr>
+<tr><td><code>--radius-input</code></td><td>36px</td><td>输入框圆角</td></tr>
+<tr><td><code>--avatar-size</code></td><td>48px</td><td>AI 头像尺寸</td></tr>
+<tr><td><code>--avatar-radius</code></td><td>96px (full circle)</td><td>头像圆角</td></tr>
+<tr><td><code>--font-size-h1</code></td><td>30px / weight 520</td><td>一级标题</td></tr>
+<tr><td><code>--font-size-h2</code></td><td>26px / weight 520</td><td>二级标题</td></tr>
+<tr><td><code>--font-size-h3</code></td><td>24px / weight 520</td><td>三级标题</td></tr>
+<tr><td><code>--font-size-body</code></td><td>21-24px / weight 330-380</td><td>正文</td></tr>
+<tr><td><code>--font-size-thinking</code></td><td>20px / weight 380</td><td>思考过程标题</td></tr>
+<tr><td><code>--font-size-detail</code></td><td>18px / weight 330</td><td>思考过程详情文字</td></tr>
+<tr><td><code>--font-size-code</code></td><td>20px / weight 380</td><td>代码文字</td></tr>
+<tr><td><code>--font-size-table</code></td><td>20px / weight 330-450</td><td>表格文字</td></tr>
+</table>
+<div class="note">📐 注意：以上数值直接取自 Figma 设计稿（2000px 宽画布）。实际开发中需根据目标分辨率做等比缩放。建议以 1440px 视口为基准，缩放系数约 0.72。</div>
+</div></div>
+
+<h2>五、优先修复建议</h2>
+<div class="card"><div class="card-b">
+<table>
+<tr><th>优先级</th><th>修复项</th><th>负责方</th><th>工作量估算</th></tr>
+<tr><td><span class="tag tr">P0</span></td><td>用户消息气泡颜色：#2979FF → #D1E3FF，文字色改黑</td><td>研发</td><td>0.5h</td></tr>
+<tr><td><span class="tag tr">P0</span></td><td>AI 头像替换为品牌 Logo + "Miclaw" 文字</td><td>研发</td><td>1h</td></tr>
+<tr><td><span class="tag tr">P0</span></td><td>实现 6 种深度思考子类型（Think/Read/Recall/Tools/Build/Help）</td><td>研发</td><td>3-5d</td></tr>
+<tr><td><span class="tag tr">P0</span></td><td>补充空状态首屏设计</td><td>设计</td><td>1d</td></tr>
+<tr><td><span class="tag tr">P0</span></td><td>补充流式输出动画规范</td><td>设计</td><td>0.5d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>实现代码块组件（深色/浅色两种主题）</td><td>研发</td><td>2d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>实现 Markdown 标题层级（H1-H3 字号/字重）</td><td>研发</td><td>1d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>实现表格组件（多列/对比两种样式）</td><td>研发</td><td>2d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>实现任务清单 Checklist</td><td>研发</td><td>1d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>实现交互问答选择卡片</td><td>研发</td><td>1d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>补充 Hover 态完整定义</td><td>设计</td><td>1d</td></tr>
+<tr><td><span class="tag ta">P1</span></td><td>补充消息加载骨架屏/等待态</td><td>设计</td><td>0.5d</td></tr>
+<tr><td><span class="tag tg">P2</span></td><td>实现图片消息/文件附件卡片</td><td>研发</td><td>2d</td></tr>
+<tr><td><span class="tag tg">P2</span></td><td>实现工具调用进度条</td><td>研发</td><td>1d</td></tr>
+<tr><td><span class="tag tg">P2</span></td><td>全局字体替换为 MiSans</td><td>研发</td><td>0.5d</td></tr>
+</table>
+</div></div>
+
+<h2>六、总结</h2>
+<div class="card"><div class="card-b" style="font-size:13.5px;line-height:1.8">
+<p><strong>设计稿完整度：</strong>Figma 设计稿 (node 448-3749) 对对话流的核心场景覆盖较为全面，定义了 22 种组件/场景，涵盖了从普通文本到深度思考链、代码块、表格、交互选择等丰富的内容类型。6 种思考子类型（Think/Read/Recall/Tools/Build/Help）的设计尤为细致。</p>
+<br>
+<p><strong>设计稿缺口：</strong>主要缺失动态交互规范（流式输出、展开折叠动画、骨架屏）和边界场景（空状态、长消息折叠、网络异常）。建议设计师优先补充流式输出和空状态设计。</p>
+<br>
+<p><strong>工程还原度：</strong>当前工程 Demo 覆盖了约 5/12 的核心组件，且已覆盖部分存在颜色（用户气泡）、字号（全局偏小）、品牌元素（头像/Logo）等显著偏差。最关键的 6 种深度思考子类型完全未实现。</p>
+<br>
+<p><strong>建议：</strong>研发侧优先修复用户气泡颜色和 AI 头像（0.5d），然后推进深度思考子类型实现（3-5d）。设计侧优先补充流式输出动画规范和空状态设计。</p>
+</div></div>
+
+<div style="text-align:center;padding:40px 0;font-size:12px;color:var(--t3)">
+— 报告由 Kiro 基于 Figma API 数据自动生成 · 2026-03-31 —
+</div>
+
+</div></body></html>
