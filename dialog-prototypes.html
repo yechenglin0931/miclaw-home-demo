@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PC MiClaw 二次对话弹窗原型 — 5 种类型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F6F7FA;--surface:#FFFFFF;--surface-hover:#EEF0F5;--surface-muted:#F2F3F7;--surface-inset:#E9EBF0;
+  --border:#DDE0E8;--border-light:#E9EBF0;
+  --text:#1C1F28;--text-2:#636878;--text-3:#868BA0;
+  --accent:#3482FF;--accent-hover:#2B6FE0;--accent-muted:rgba(52,130,255,.10);
+  --shadow-modal:0 8px 30px rgba(0,0,0,.16),0 2px 8px rgba(0,0,0,.08);
+  --font:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+html,body{height:100%;font-family:var(--font);color:var(--text);background:#1a1a2e;overflow:hidden}
+
+/* Tab bar */
+.tab-bar{position:fixed;top:0;left:0;right:0;height:48px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;z-index:200;gap:4px}
+.tab-bar-title{font-size:14px;font-weight:600;color:var(--text);margin-right:24px;white-space:nowrap}
+.tab{height:100%;display:flex;align-items:center;padding:0 14px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
+
+/* Backdrop */
+.backdrop{position:fixed;top:48px;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;display:none}
+.backdrop.active{display:flex}
+
+/* Modal base */
+.modal{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-modal);overflow:hidden;animation:scale-in .2s ease-out}
+@keyframes scale-in{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+/* Accent bar */
+.accent-bar{height:4px;width:100%;background:var(--accent)}
+
+/* Header */
+.modal-header{display:flex;align-items:flex-start;gap:12px;padding:16px 20px 12px}
+.header-icon{flex-shrink:0;margin-top:2px;padding:8px;border-radius:12px;background:var(--accent-muted);display:flex;align-items:center;justify-content:center}
+.header-icon svg{width:20px;height:20px;color:var(--accent)}
+.header-body{flex:1;min-width:0}
+.header-title{font-size:16px;font-weight:600;color:var(--text)}
+.header-desc{font-size:12px;color:var(--text-2);margin-top:2px}
+.close-btn{flex-shrink:0;margin-top:2px;padding:6px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:var(--text-2);transition:background .15s}
+.close-btn:hover{background:var(--surface-hover)}
+.close-btn svg{width:16px;height:16px}
+.divider{margin:0 20px;height:1px;background:var(--border)}
+
+/* Progress bar (wizard) */
+.progress-bar{height:4px;background:var(--surface-muted)}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s ease}
+
+/* Content area */
+.modal-content{padding:20px 20px 16px;max-height:60vh;overflow-y:auto}
+
+/* Question */
+.q-header-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:4px 8px;border-radius:20px;background:var(--surface-hover);color:var(--text-2);margin-bottom:12px}
+.q-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:16px}
+
+/* Options */
+.option{width:100%;text-align:left;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;background:transparent;font-family:var(--font);display:flex;align-items:flex-start;gap:12px}
+.option:hover{background:var(--surface-hover);border-color:rgba(52,130,255,.5)}
+.option.selected{border-color:var(--accent);background:var(--accent-muted)}
+.option-radio{flex-shrink:0;margin-top:2px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.option.selected .option-radio{border-color:var(--accent)}
+.option.selected .option-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.option-checkbox{flex-shrink:0;margin-top:2px;width:16px;height:16px;border-radius:4px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.option.selected .option-checkbox{background:var(--accent);border-color:var(--accent)}
+.option-label{font-size:14px;font-weight:500;color:var(--text)}
+.option-desc{font-size:12px;color:var(--text-2);margin-top:2px}
+
+/* Other input row */
+.other-row{display:flex;align-items:center;gap:12px;margin-top:16px}
+.other-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;transition:border-color .2s}
+.other-input:focus{border-color:var(--accent)}
+.other-input::placeholder{color:var(--text-2)}
+.skip-btn{padding:8px 16px;font-size:14px;font-weight:500;color:var(--text-2);background:transparent;border:none;border-radius:10px;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:background .15s}
+.skip-btn:hover{background:var(--surface-hover)}
+
+/* Step indicators */
+.steps-row{display:flex;align-items:center;gap:8px}
+.step-nav{padding:6px;border-radius:8px;border:none;background:transparent;cursor:pointer;color:var(--text);transition:background .15s;display:flex;align-items:center}
+.step-nav:hover{background:var(--surface-hover)}
+.step-nav svg{width:20px;height:20px}
+.step-dots{display:flex;align-items:center;gap:6px}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:none}
+.step-dot.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(52,130,255,.3)}
+.step-dot.done{background:rgba(34,197,94,.15);color:#16a34a;border:1px solid #22c55e}
+.step-dot.pending{background:var(--surface-hover);color:var(--text-2)}
+.step-dot:hover{transform:scale(1.05)}
+
+/* Footer */
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 20px;border-top:1px solid var(--border);background:var(--surface-muted)}
+.btn{padding:8px 16px;font-size:14px;font-weight:500;border-radius:10px;border:none;cursor:pointer;font-family:var(--font);transition:all .15s}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--surface-hover)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+
+/* Permission specific */
+.tool-section{margin-bottom:16px}
+.tool-label{display:block;font-size:11px;font-weight:500;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.tool-value{padding:8px 12px;border-radius:10px;background:var(--bg)}
+.tool-value code{font-size:14px;color:var(--text);font-family:var(--font)}
+.tool-json{padding:8px 12px;border-radius:10px;background:var(--bg);max-height:192px;overflow-y:auto}
+.tool-json pre{font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-all;font-family:'SF Mono','Fira Code',monospace;line-height:1.6}
+.danger-bar{display:flex;align-items:flex-start;gap:8px;padding:12px;border-radius:10px;background:#fef2f2;border:1px solid #fecaca}
+.danger-bar svg{flex-shrink:0;margin-top:2px;width:20px;height:20px;color:#ef4444}
+.danger-bar p{font-size:14px;color:#b91c1c}
+
+/* Question block (permission modal flat layout) */
+.q-block{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <div class="tab-bar-title">二次对话弹窗原型</div>
+  <div class="tab active" data-idx="0">① 单选问题</div>
+  <div class="tab" data-idx="1">② 多选问题</div>
+  <div class="tab" data-idx="2">③ 多步骤向导</div>
+  <div class="tab" data-idx="3">④ 安全确认</div>
+  <div class="tab" data-idx="4">⑤ 系统澄清</div>
+</div>
+
+<!-- ===== Type 1: Single Select (AgentQuestionWizard, 1 question) ===== -->
+<div class="backdrop active" id="bd0">
+<div class="modal" style="width:672px;max-width:90vw">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border)">
+    <div style="flex:1"><h2 style="font-size:18px;font-weight:600;color:var(--text)">需要您的确认</h2></div>
+    <button class="close-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="modal-content" style="min-height:300px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px">
+      <div>
+        <div class="q-header-tag">出发城市</div>
+        <div class="q-text">您从哪个城市出发去芽庄？</div>
+      </div>
+      <div class="steps-row">
+        <div class="step-dots">
+          <div class="step-dot active">1</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <button class="option selected" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">北京</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">上海</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">广州</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">深圳</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">成都</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">其他城市（请注明）</div></div>
+      </button>
+    </div>
+    <div class="other-row">
+      <input class="other-input" placeholder="其他">
+      <button class="skip-btn">跳过</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary">提交</button>
+  </div>
+</div>
+</div>
+
+<!-- ===== Type 2: Multi Select ===== -->
+<div class="backdrop" id="bd1">
+<div class="modal" style="width:672px;max-width:90vw">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border)">
+    <div style="flex:1"><h2 style="font-size:18px;font-weight:600;color:var(--text)">需要您的确认</h2></div>
+    <button class="close-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="modal-content" style="min-height:300px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px">
+      <div>
+        <div class="q-header-tag">早报内容</div>
+        <div class="q-text">你希望早报包含哪些内容？</div>
+      </div>
+      <div class="steps-row">
+        <div class="step-dots"><div class="step-dot active">1</div></div>
+      </div>
+    </div>
+    <div>
+      <button class="option selected" onclick="toggleMulti(this)">
+        <div class="option-checkbox"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="option-label">今日日程</div><div class="option-desc">从日历中提取今天的会议和待办</div></div>
+      </button>
+      <button class="option selected" onclick="toggleMulti(this)">
+        <div class="option-checkbox"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="option-label">AI 行业资讯</div><div class="option-desc">最新的 AI 行业动态和技术进展</div></div>
+      </button>
+      <button class="option" onclick="toggleMulti(this)">
+        <div class="option-checkbox"></div>
+        <div><div class="option-label">天气预报</div><div class="option-desc">今天和明天的天气情况</div></div>
+      </button>
+      <button class="option selected" onclick="toggleMulti(this)">
+        <div class="option-checkbox"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><div class="option-label">邮件摘要</div><div class="option-desc">未读邮件的关键内容提取</div></div>
+      </button>
+    </div>
+    <div class="other-row">
+      <input class="other-input" placeholder="其他">
+      <button class="skip-btn">跳过</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary">提交</button>
+  </div>
+</div>
+</div>
+
+<!-- ===== Type 3: Multi-step Wizard ===== -->
+<div class="backdrop" id="bd2">
+<div class="modal" style="width:672px;max-width:90vw">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px 24px;border-bottom:1px solid var(--border)">
+    <div style="flex:1"><h2 style="font-size:18px;font-weight:600;color:var(--text)">需要您的确认</h2></div>
+    <button class="close-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" style="width:66.6%"></div></div>
+  <div class="modal-content" style="min-height:300px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px">
+      <div>
+        <div class="q-header-tag">出行日期</div>
+        <div class="q-text">你计划什么时候出发？</div>
+      </div>
+      <div class="steps-row">
+        <button class="step-nav" title="上一个"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="step-dots">
+          <div class="step-dot done"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="step-dot active">2</div>
+          <div class="step-dot pending">3</div>
+        </div>
+        <button class="step-nav" title="下一个"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+    <div>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">五一假期（4月30日-5月4日）</div></div>
+      </button>
+      <button class="option selected" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">端午假期（5月31日-6月2日）</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">周末两天</div></div>
+      </button>
+      <button class="option" onclick="selectSingle(this)">
+        <div class="option-radio"></div>
+        <div><div class="option-label">其他时间（请注明）</div></div>
+      </button>
+    </div>
+    <div class="other-row">
+      <input class="other-input" placeholder="其他">
+      <button class="skip-btn">跳过</button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary">提交</button>
+  </div>
+</div>
+</div>
+
+<!-- ===== Type 4: Safety Permission (with dangerous bash) ===== -->
+<div class="backdrop" id="bd3">
+<div class="modal" style="width:512px;max-width:90vw">
+  <div class="accent-bar"></div>
+  <div class="modal-header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="header-body">
+      <div class="header-title">需要权限确认</div>
+      <div class="header-desc">miclaw 请求执行以下操作</div>
+    </div>
+    <button class="close-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="divider"></div>
+  <div class="modal-content">
+    <div class="tool-section">
+      <label class="tool-label">工具名称</label>
+      <div class="tool-value"><code>Bash</code></div>
+    </div>
+    <div class="tool-section">
+      <label class="tool-label">工具参数</label>
+      <div class="tool-json"><pre>{
+  "command": "rm -rf /tmp/old-cache && echo 'cleaned'"
+}</pre></div>
+    </div>
+    <div class="danger-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p>警告：此操作可能会修改文件或执行系统命令，请仔细检查。</p>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost">拒绝</button>
+    <button class="btn btn-primary">允许</button>
+  </div>
+</div>
+</div>
+
+<!-- ===== Type 5: System Clarification (schedule-time) ===== -->
+<div class="backdrop" id="bd4">
+<div class="modal" style="width:512px;max-width:90vw">
+  <div class="accent-bar"></div>
+  <div class="modal-header">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div class="header-body">
+      <div class="header-title">需要您的确认</div>
+    </div>
+    <button class="close-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="divider"></div>
+  <div class="modal-content">
+    <div class="q-block">
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px">
+        <div class="q-header-tag">补充关键信息</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text)">在继续前，我还缺少具体时间。请直接补充你希望执行或提醒的时间。</div>
+      </div>
+      <div>
+        <button class="option selected" onclick="selectSingle(this)" style="margin-bottom:8px">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-label">我来补充信息 (Recommended)</div>
+            <div class="option-desc">请直接补充关键信息后继续。</div>
+          </div>
+        </button>
+        <button class="option" onclick="selectSingle(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-label">按当前理解继续</div>
+            <div class="option-desc">允许助手按当前理解继续，可能存在偏差。</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost">直接拒绝请求</button>
+    <button class="btn btn-primary">提交当前选择</button>
+  </div>
+</div>
+</div>
+
+<script>
+// Tab switching
+var tabs=document.querySelectorAll('.tab');
+tabs.forEach(function(tab){
+  tab.addEventListener('click',function(){
+    var idx=+this.dataset.idx;
+    tabs.forEach(function(t){t.classList.remove('active')});
+    this.classList.add('active');
+    for(var i=0;i<5;i++){
+      document.getElementById('bd'+i).classList.toggle('active',i===idx);
+    }
+  });
+});
+
+// Single select interaction
+function selectSingle(el){
+  var siblings=el.parentElement.querySelectorAll('.option');
+  siblings.forEach(function(s){s.classList.remove('selected')});
+  el.classList.add('selected');
+}
+
+// Multi select interaction
+function toggleMulti(el){
+  el.classList.toggle('selected');
+  var cb=el.querySelector('.option-checkbox');
+  if(el.classList.contains('selected')){
+    cb.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6 11L3 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }else{
+    cb.innerHTML='';
+  }
+}
+</script>
+</body>
+</html>
