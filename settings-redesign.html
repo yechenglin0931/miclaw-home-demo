@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC MiClaw 设置页重构方案</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0F1117;
+    --surface: #1A1D27;
+    --surface-inset: #151820;
+    --surface-hover: #1E2230;
+    --border: rgba(255,255,255,0.06);
+    --text: #E8E9ED;
+    --text-secondary: #8B8D97;
+    --accent: #4C8BF5;
+    --accent-hover: #5A96FF;
+    --danger: #EF4444;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  /* ── Change Badge ── */
+  .change-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 2px 7px;
+    border-radius: 6px;
+    vertical-align: middle;
+    margin-left: 8px;
+    position: relative;
+    top: -1px;
+  }
+  .badge-new { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .badge-moved { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .badge-removed { background: rgba(239,68,68,0.15); color: #f87171; }
+  .badge-merged { background: rgba(168,85,247,0.15); color: #c084fc; }
+
+  /* ── Layout ── */
+  .settings-window {
+    width: 780px;
+    height: 580px;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+  }
+
+  /* ── Title Bar ── */
+  .title-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .traffic-lights {
+    display: flex;
+    gap: 8px;
+    margin-right: 16px;
+  }
+  .traffic-light {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .tl-close { background: #FF5F57; }
+  .tl-min { background: #FEBC2E; }
+  .tl-max { background: #28C840; }
+  .title-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* ── Body ── */
+  .settings-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 15px 16px 8px;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 168px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    padding-right: 12px;
+    overflow-y: auto;
+  }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.75);
+  }
+  .sidebar-item.active {
+    background: var(--surface);
+    color: var(--text);
+  }
+  .sidebar-icon {
+    width: 16px; height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+
+  /* ── Content ── */
+  .content {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 8px 32px 32px;
+  }
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 32px; }
+  .section:last-child { margin-bottom: 0; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .section-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── Toggle Row ── */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .toggle-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .toggle-label.disabled { opacity: 0.45; }
+
+  /* ── Toggle Switch ── */
+  .toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .toggle input { display: none; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #3A3F4B;
+    border-radius: 12px;
+    transition: background 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--accent); }
+  .toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    pointer-events: none;
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+  .toggle.disabled { opacity: 0.45; pointer-events: none; }
+
+  /* ── Select ── */
+  .select-wrap {
+    position: relative;
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .select-wrap select {
+    width: 100%;
+    padding: 6px 32px 6px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 13px;
+    font-family: var(--font);
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .select-wrap select:hover { border-color: rgba(255,255,255,0.12); }
+  .select-wrap select:focus { border-color: var(--accent); }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 11px;
+    pointer-events: none;
+  }
+
+  /* ── Theme Cards ── */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .theme-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: none;
+    color: var(--text);
+    font-family: var(--font);
+  }
+  .theme-card:hover { border-color: rgba(76,139,245,0.4); }
+  .theme-card.selected {
+    border-color: var(--accent);
+    background: rgba(76,139,245,0.06);
+  }
+  .theme-preview {
+    width: 100%;
+    height: 48px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .theme-card-label {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .theme-card.selected .theme-card-label { color: var(--accent); }
+
+  /* ── Account Card ── */
+  .account-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface-inset);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .account-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4C8BF5, #7C5CFC);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+  }
+  .account-info { flex: 1; min-width: 0; }
+  .account-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .account-id {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .account-logout {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+  }
+  .account-logout:hover {
+    color: var(--danger);
+    border-color: rgba(239,68,68,0.3);
+    background: rgba(239,68,68,0.06);
+  }
+
+  /* ── Link Row ── */
+  .link-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .link-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: color 0.15s;
+    background: none;
+    border: none;
+    font-family: var(--font);
+    width: fit-content;
+  }
+  .link-item:hover { color: var(--accent-hover); }
+  .link-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .link-item.secondary {
+    color: var(--text-secondary);
+  }
+  .link-item.secondary:hover { color: var(--text); }
+  .link-item.secondary svg { width: 14px; height: 14px; }
+
+  .version-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+  }
+
+  /* ── Radio Card ── */
+  .radio-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .radio-card:hover { border-color: rgba(76,139,245,0.4); }
+  .radio-card.selected { border-color: var(--accent); }
+  .radio-card input[type="radio"] {
+    margin-top: 3px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+  }
+  .radio-card-content { flex: 1; }
+  .radio-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .radio-card-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .radio-card-active {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  /* ── Button ── */
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover {
+    background: var(--surface-hover);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  /* ── Annotation overlay ── */
+  .annotation-bar {
+    width: 780px;
+    margin-bottom: 20px;
+    padding: 14px 20px;
+    background: var(--surface-inset);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .annotation-bar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-right: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Annotation Legend -->
+<div style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+
+<div class="annotation-bar">
+  <span class="annotation-bar-title">设置页重构方案</span>
+  <span class="change-badge badge-merged">合入</span>
+  <span class="change-badge badge-moved">移动</span>
+  <span class="change-badge badge-removed">移除</span>
+  <span style="flex:1"></span>
+  <span style="font-size:12px;color:var(--text-secondary);">点击左侧 Tab 切换查看</span>
+</div>
+
+<!-- Settings Window -->
+<div class="settings-window">
+  <!-- Title Bar -->
+  <div class="title-bar">
+    <div class="traffic-lights">
+      <div class="traffic-light tl-close"></div>
+      <div class="traffic-light tl-min"></div>
+      <div class="traffic-light tl-max"></div>
+    </div>
+    <span class="title-text">设置</span>
+  </div>
+
+  <!-- Body -->
+  <div class="settings-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-tab="general">
+          <span class="sidebar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </span>
+          通用
+        </button>
+        <button class="sidebar-item" data-tab="skills">
+          <span class="sidebar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
+          技能
+        </button>
+        <button class="sidebar-item" data-tab="mcp">
+          <span class="sidebar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </span>
+          MCP
+        </button>
+        <button class="sidebar-item" data-tab="labs">
+          <span class="sidebar-icon">🧪</span>
+          实验室
+        </button>
+      </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- ═══════════ 通用 Tab ═══════════ -->
+      <div class="tab-panel active" id="tab-general">
+
+        <!-- 账号区 -->
+        <div class="section">
+          <div class="section-title">账号 <span class="change-badge badge-merged">合入</span></div>
+          <div class="account-card">
+            <div class="account-avatar">叶</div>
+            <div class="account-info">
+              <div class="account-name">叶成林</div>
+              <div class="account-id">小米账号 · 1800****931</div>
+            </div>
+            <button class="account-logout">退出登录</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 语言 -->
+        <div class="section">
+          <div class="toggle-row">
+            <span class="section-title" style="margin-bottom:0">语言</span>
+            <div class="select-wrap">
+              <select>
+                <option selected>中文</option>
+                <option>English</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 开机自启动 -->
+        <div class="section">
+          <div class="section-title">开机自启动</div>
+          <div class="toggle-row">
+            <span class="toggle-label">开机时自动启动 MiClaw</span>
+            <label class="toggle">
+              <input type="checkbox" checked>
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 外观 -->
+        <div class="section">
+          <div class="section-title">外观</div>
+          <div class="theme-grid">
+            <button class="theme-card" onclick="selectTheme(this)">
+              <div class="theme-preview">
+                <svg viewBox="0 0 120 48" width="100%" height="100%">
+                  <rect width="120" height="48" fill="#F8F9FB"/>
+                  <rect x="0" y="0" width="30" height="48" fill="#EBEDF0"/>
+                  <rect x="4" y="5" width="22" height="3" rx="1.5" fill="#C8CBD0"/>
+                  <rect x="4" y="11" width="18" height="2.5" rx="1.25" fill="#D5D7DB"/>
+                  <rect x="36" y="5" width="78" height="38" rx="3" fill="#FFFFFF"/>
+                  <rect x="42" y="10" width="50" height="3" rx="1.5" fill="#D5D7DB"/>
+                  <rect x="42" y="16" width="66" height="2.5" rx="1.25" fill="#E2E4E7"/>
+                  <rect x="42" y="28" width="40" height="3" rx="1.5" fill="#D5D7DB"/>
+                </svg>
+              </div>
+              <span class="theme-card-label">浅色</span>
+            </button>
+            <button class="theme-card selected" onclick="selectTheme(this)">
+              <div class="theme-preview">
+                <svg viewBox="0 0 120 48" width="100%" height="100%">
+                  <rect width="120" height="48" fill="#0F1117"/>
+                  <rect x="0" y="0" width="30" height="48" fill="#151820"/>
+                  <rect x="4" y="5" width="22" height="3" rx="1.5" fill="#3A3F4B"/>
+                  <rect x="4" y="11" width="18" height="2.5" rx="1.25" fill="#2A2F3A"/>
+                  <rect x="36" y="5" width="78" height="38" rx="3" fill="#1A1D27"/>
+                  <rect x="42" y="10" width="50" height="3" rx="1.5" fill="#3A3F4B"/>
+                  <rect x="42" y="16" width="66" height="2.5" rx="1.25" fill="#252930"/>
+                  <rect x="42" y="28" width="40" height="3" rx="1.5" fill="#3A3F4B"/>
+                </svg>
+              </div>
+              <span class="theme-card-label">深色</span>
+            </button>
+            <button class="theme-card" onclick="selectTheme(this)">
+              <div class="theme-preview">
+                <svg viewBox="0 0 120 48" width="100%" height="100%">
+                  <defs>
+                    <clipPath id="lh"><rect x="0" y="0" width="60" height="48"/></clipPath>
+                    <clipPath id="rh"><rect x="60" y="0" width="60" height="48"/></clipPath>
+                  </defs>
+                  <g clip-path="url(#lh)">
+                    <rect width="120" height="48" fill="#F8F9FB"/>
+                    <rect x="0" y="0" width="30" height="48" fill="#EBEDF0"/>
+                    <rect x="4" y="5" width="22" height="3" rx="1.5" fill="#C8CBD0"/>
+                    <rect x="36" y="5" width="78" height="38" rx="3" fill="#FFFFFF"/>
+                    <rect x="42" y="10" width="50" height="3" rx="1.5" fill="#D5D7DB"/>
+                  </g>
+                  <g clip-path="url(#rh)">
+                    <rect width="120" height="48" fill="#0F1117"/>
+                    <rect x="0" y="0" width="30" height="48" fill="#151820"/>
+                    <rect x="4" y="5" width="22" height="3" rx="1.5" fill="#3A3F4B"/>
+                    <rect x="36" y="5" width="78" height="38" rx="3" fill="#1A1D27"/>
+                    <rect x="42" y="10" width="50" height="3" rx="1.5" fill="#3A3F4B"/>
+                  </g>
+                  <line x1="60" y1="0" x2="60" y2="48" stroke="#888" stroke-width="0.5"/>
+                </svg>
+              </div>
+              <span class="theme-card-label">跟随系统</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 通知（精简版） -->
+        <div class="section">
+          <div class="section-title">通知 <span class="change-badge badge-merged">合入</span></div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="toggle-row">
+              <span class="toggle-label">启用系统通知</span>
+              <label class="toggle">
+                <input type="checkbox" checked id="notif-toggle">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label" id="sound-label">通知提示音</span>
+              <label class="toggle" id="sound-toggle">
+                <input type="checkbox" checked>
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <span style="font-size:11px;color:var(--text-secondary);">
+              <span class="change-badge badge-removed">移除</span> 发送测试通知、IM 通知开关
+            </span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 关于 -->
+        <div class="section">
+          <div class="section-title">关于</div>
+          <div class="link-row">
+            <button class="link-item">
+              隐私政策
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+            <button class="link-item">
+              用户协议
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+            <button class="link-item secondary">
+              撤回同意
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div class="version-text">版本 1.4.2 (build 45cc0e47)</div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 技能 Tab ═══════════ -->
+      <div class="tab-panel" id="tab-skills">
+        <div class="section">
+          <div class="section-title">技能管理</div>
+          <div style="padding:40px 0;text-align:center;color:var(--text-secondary);font-size:13px;">
+            （技能管理组件不变，此处省略）
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ MCP Tab ═══════════ -->
+      <div class="tab-panel" id="tab-mcp">
+        <div class="section">
+          <div class="section-title">MCP 服务器</div>
+          <div style="padding:40px 0;text-align:center;color:var(--text-secondary);font-size:13px;">
+            （MCP 管理组件不变，此处省略）
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ 实验室 Tab ═══════════ -->
+      <div class="tab-panel" id="tab-labs">
+
+        <!-- 沙盒 → 移入实验室 -->
+        <div class="section">
+          <div class="section-title">Agent 执行模式 <span class="change-badge badge-moved">移动</span></div>
+          <div class="radio-group">
+            <label class="radio-card" onclick="selectRadio(this)">
+              <input type="radio" name="exec-mode" value="lightweight">
+              <div class="radio-card-content">
+                <div class="radio-card-title">内置模式</div>
+                <div class="radio-card-hint">使用内置 Agent 引擎，轻量快速</div>
+              </div>
+            </label>
+            <label class="radio-card selected" onclick="selectRadio(this)">
+              <input type="radio" name="exec-mode" value="local" checked>
+              <div class="radio-card-content">
+                <div class="radio-card-title">本地模式</div>
+                <div class="radio-card-hint">使用本地 LangGraph 运行时，功能完整</div>
+                <div class="radio-card-active">下次任务生效</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 米家 → 移入实验室 -->
+        <div class="section">
+          <div class="section-title">米家 <span class="change-badge badge-moved">移动</span></div>
+          <div class="section-desc">选择 AI 可以访问的家庭</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;">
+              <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;">
+              <span>我的家 <span style="font-size:12px;color:var(--text-secondary);margin-left:4px;">· 客厅、卧室、书房</span></span>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;">
+              <input type="checkbox" style="accent-color:var(--accent);width:16px;height:16px;">
+              <span>老家 <span style="font-size:12px;color:var(--text-secondary);margin-left:4px;">· 客厅、主卧（共享）</span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 日志收集 → 从通用移入 -->
+        <div class="section">
+          <div class="section-title">日志收集 <span class="change-badge badge-moved">移动</span></div>
+          <div class="section-desc">收集运行日志用于问题排查，日志不包含对话内容。</div>
+          <button class="btn btn-primary" onclick="this.textContent='导出中...';setTimeout(()=>{this.textContent='导出日志'},1500)">导出日志</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- LLM 日志 -->
+        <div class="section">
+          <div class="section-title">大模型日志跟踪</div>
+          <div class="toggle-row">
+            <span class="toggle-label">开启后将 LLM 请求/响应写入 llm.log，关闭后立即停止写入。</span>
+            <label class="toggle">
+              <input type="checkbox">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 详细日志 -->
+        <div class="section">
+          <div class="section-title">打开详细日志</div>
+          <div class="toggle-row">
+            <span class="toggle-label">开启后日志将记录完整原始信息，可能包含敏感信息，请勿分享日志文件给他人。</span>
+            <label class="toggle">
+              <input type="checkbox">
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 被移除的项目说明 -->
+        <div class="divider"></div>
+        <div class="section">
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">
+            <span class="change-badge badge-removed">移除</span> 缩略图缓存（已有 500MB 自动清理，无需手动操作）<br>
+            <span style="display:inline-block;margin-top:6px;">
+              <span class="change-badge badge-removed">移除</span> 事件模拟器（保持注释状态）
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /settings-body -->
+</div><!-- /settings-window -->
+
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tabId = btn.dataset.tab;
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+    });
+  });
+
+  // Theme card selection
+  function selectTheme(el) {
+    el.parentElement.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Radio card selection
+  function selectRadio(el) {
+    el.closest('.radio-group').querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Notification toggle disables sound
+  document.getElementById('notif-toggle').addEventListener('change', function() {
+    const soundToggle = document.getElementById('sound-toggle');
+    const soundLabel = document.getElementById('sound-label');
+    if (!this.checked) {
+      soundToggle.classList.add('disabled');
+      soundLabel.classList.add('disabled');
+    } else {
+      soundToggle.classList.remove('disabled');
+      soundLabel.classList.remove('disabled');
+    }
+  });
+</script>
+
+</body>
+</html>
