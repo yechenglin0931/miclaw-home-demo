@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>PC MiClaw 灵感广场</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F4F5F9;--surface:#FFF;--hover:rgba(59,130,246,0.06);--border:#E8EAF0;--text:#1A1D26;--textSec:#5F6577;--textTer:#A0A6B8;--accent:#3B82F6;--accentBg:rgba(59,130,246,0.08);--font:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif}
+html,body{height:100%}
+body{font-family:var(--font);background:#E8EBF0;color:var(--text);-webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:20px}
+.win{width:1100px;height:720px;background:var(--bg);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.10),0 0 0 1px rgba(0,0,0,0.04)}
+.tbar{height:52px;display:flex;align-items:center;padding:0 20px;flex-shrink:0}
+.dots{display:flex;gap:8px}.dot{width:12px;height:12px;border-radius:50%}.d-r{background:#FF5F57}.d-y{background:#FEBC2E}.d-g{background:#28C840}
+.body{display:flex;flex:1;min-height:0;padding:0 8px 8px;gap:0}
+.sb{width:220px;flex-shrink:0;background:var(--surface);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;margin-right:8px}
+.sb-hdr{height:40px;display:flex;align-items:center;justify-content:flex-end;padding:8px 12px 0}
+.sb-col{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--textTer);cursor:pointer;border:none;background:none}
+.sb-col:hover{background:rgba(0,0,0,0.04)}
+.sb-nav{padding:8px 12px 0;display:flex;flex-direction:column;gap:1px}
+.sb-btn{width:100%;display:flex;align-items:center;gap:10px;border-radius:10px;padding:9px 12px;font-size:14px;font-weight:500;color:var(--textSec);cursor:pointer;border:none;background:none;text-align:left;transition:all .12s}
+.sb-btn:hover{background:rgba(0,0,0,0.03);color:var(--text)}
+.sb-btn.on{background:var(--accentBg);color:var(--accent)}
+.sb-btn svg{width:18px;height:18px;flex-shrink:0}
+.sb-scr{flex:1;overflow-y:auto;padding:0 12px 16px}
+.sb-scr::-webkit-scrollbar{width:3px}
+.sb-scr::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.08);border-radius:99px}
+.sb-lbl{font-size:12px;font-weight:500;color:var(--accent);padding:18px 12px 6px}
+.sb-sub{font-size:11px;color:var(--textTer);padding:12px 12px 4px}
+.sb-h{font-size:13.5px;padding:8px 12px;border-radius:8px;color:var(--text);cursor:pointer;transition:all .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-h:hover{background:rgba(0,0,0,0.03)}
+.mc{flex:1;min-width:0;border-radius:18px;background:var(--surface);position:relative;overflow:hidden}
+.view{position:absolute;inset:0;display:none;flex-direction:column}
+.view.on{display:flex}
+.insp-scr{flex:1;overflow-y:auto;padding:36px 40px 40px}
+.insp-scr::-webkit-scrollbar{width:5px}
+.insp-scr::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.06);border-radius:99px}
+.insp-badge{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);background:var(--accentBg);padding:4px 12px;border-radius:16px;margin-bottom:12px}
+.insp-scr h1{font-size:21px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em}
+.insp-scr .sub{font-size:14px;color:var(--textSec);margin-bottom:24px}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:18px;font-size:13px;font-weight:500;color:var(--textSec);background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all .15s}
+.tab:hover{background:var(--hover);color:var(--text);border-color:rgba(59,130,246,0.2)}
+.tab.on{background:var(--accentBg);color:var(--accent);border-color:rgba(59,130,246,0.3)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;gap:6px}
+.card:hover{border-color:rgba(59,130,246,0.4);box-shadow:0 4px 16px rgba(59,130,246,0.08);transform:translateY(-1px)}
+.card-em{font-size:22px;line-height:1;margin-bottom:2px}
+.card-t{font-size:14px;font-weight:600;color:var(--text)}
+.card-d{font-size:12px;color:var(--textSec);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-b{display:inline-flex;align-self:flex-start;font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;margin-top:4px}
+.card-b.bl{background:rgba(59,130,246,0.07);color:#2563EB}
+.card-b.pu{background:rgba(139,92,246,0.07);color:#7C3AED}
+.card-b.gr{background:rgba(22,163,74,0.07);color:#15803D}
+.card-b.or{background:rgba(234,88,12,0.07);color:#C2410C}
+.card-b.am{background:rgba(180,83,9,0.07);color:#92400E}
+.chat-v{display:flex;flex-direction:column;height:100%}
+.chat-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.chat-logo{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6366F1,#3B82F6);display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:0 4px 12px rgba(59,130,246,0.2)}
+.chat-logo svg{width:30px;height:30px;fill:white}
+.chat-brand{font-size:15px;font-weight:600;color:var(--text)}
+.chat-bottom{flex-shrink:0;padding:0 16px 16px}
+.chat-quick{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.chat-qb{padding:6px 14px;border-radius:18px;font-size:13px;color:var(--textSec);border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:4px}
+.chat-qb:hover{border-color:var(--accent);color:var(--accent)}
+.chat-box{max-width:680px;margin:0 auto;background:var(--surface);border:1.5px solid rgba(59,130,246,0.35);border-radius:16px;padding:14px 16px;display:flex;align-items:flex-end;gap:10px;box-shadow:0 0 0 3px rgba(59,130,246,0.06)}
+.chat-box .plus{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--textTer);flex-shrink:0;font-size:16px;line-height:1;transition:all .12s}
+.chat-box .plus:hover{border-color:var(--accent);color:var(--accent)}
+.chat-box textarea{flex:1;border:none;background:none;font-size:14px;color:var(--text);font-family:var(--font);resize:none;outline:none;line-height:1.6;min-height:22px;max-height:100px}
+.chat-box textarea::placeholder{color:var(--textTer)}
+.chat-send{width:30px;height:30px;border-radius:50%;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s}
+.chat-send:hover{background:#2563EB}
+</style>
+</head>
+<body>
+<div class="win">
+<div class="tbar"><div class="dots"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div></div></div>
+<div class="body">
+<aside class="sb">
+<div class="sb-hdr"><button class="sb-col"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><g opacity="0.8"><path d="M27.5569 11.7531C27.5569 10.7705 27.556 10.0862 27.5126 9.55436C27.47 9.03314 27.3912 8.73617 27.2773 8.5127C27.0312 8.02951 26.6381 7.63649 26.1549 7.3903C25.9315 7.27643 25.6345 7.19767 25.1133 7.15506C24.5814 7.1116 23.8972 7.11079 22.9145 7.11079H9.08811C8.10545 7.11079 7.42116 7.1116 6.88932 7.15506C6.3681 7.19767 6.07113 7.27643 5.84766 7.3903C5.36447 7.63649 4.97145 8.02951 4.72526 8.5127C4.61139 8.73617 4.53263 9.03314 4.49002 9.55436C4.44656 10.0862 4.44575 10.7705 4.44575 11.7531V20.0492C4.44575 21.0318 4.44657 21.7153 4.49002 22.2471C4.5326 22.7683 4.61145 23.0652 4.72526 23.2887C4.97143 23.7719 5.36455 24.1649 5.84766 24.4111C6.07114 24.525 6.36808 24.6046 6.88932 24.6472C7.42116 24.6907 8.10545 24.6906 9.08811 24.6906H22.9145C23.8972 24.6906 24.5814 24.6907 25.1133 24.6472C25.6345 24.6046 25.9315 24.525 26.1549 24.4111C26.6381 24.1649 27.0312 23.7719 27.2773 23.2887C27.3912 23.0652 27.47 22.7683 27.5126 22.2471C27.556 21.7153 27.5569 21.0318 27.5569 20.0492V11.7531ZM29.3346 20.0492C29.3346 21.0024 29.335 21.771 29.2843 22.392C29.2327 23.0233 29.1235 23.5802 28.8607 24.096C28.4441 24.9136 27.7798 25.5787 26.9622 25.9953C26.4463 26.2582 25.8888 26.3674 25.2574 26.4189C24.6364 26.4697 23.8677 26.4684 22.9145 26.4684H9.08811C8.13494 26.4684 7.36619 26.4697 6.74523 26.4189C6.11383 26.3674 5.55628 26.2582 5.04036 25.9953C4.22282 25.5787 3.55853 24.9136 3.14193 24.096C2.87908 23.5802 2.76991 23.0233 2.71832 22.392C2.66758 21.771 2.66797 21.0024 2.66797 20.0492V11.7531C2.66797 10.8 2.6676 10.0312 2.71832 9.41026C2.7699 8.77887 2.87905 8.22132 3.14193 7.7054C3.5585 6.88805 4.22301 6.22354 5.04036 5.80697C5.55628 5.54409 6.11383 5.43494 6.74523 5.38336C7.3662 5.33264 8.13492 5.33301 9.08811 5.33301H22.9145C23.8677 5.33301 24.6364 5.33264 25.2574 5.38336C25.8888 5.43494 26.4463 5.54409 26.9622 5.80697C27.7796 6.22354 28.4441 6.88805 28.8607 7.7054C29.1236 8.22132 29.2327 8.77887 29.2843 9.41026C29.335 10.0312 29.3346 10.8 29.3346 11.7531V20.0492Z"/><path d="M12.7387 6.22168V25.9257H10.9609V6.22168H12.7387Z"/><path d="M9.77734 9.92112C9.77734 10.412 9.37937 10.81 8.88845 10.81H6.51808C6.02716 10.81 5.6292 10.412 5.6292 9.92112C5.6292 9.4302 6.02716 9.03223 6.51809 9.03223H8.88845C9.37937 9.03223 9.77734 9.4302 9.77734 9.92112Z"/><path d="M9.77734 13.4768C9.77734 13.9677 9.37937 14.3657 8.88845 14.3657H6.51808C6.02716 14.3657 5.6292 13.9677 5.6292 13.4768C5.6292 12.9859 6.02716 12.5879 6.51808 12.5879H8.88845C9.37937 12.5879 9.77734 12.9859 9.77734 13.4768Z"/><path d="M9.77734 17.0324C9.77734 17.5234 9.37937 17.9213 8.88845 17.9213H6.51808C6.02716 17.9213 5.6292 17.5234 5.6292 17.0324C5.6292 16.5415 6.02716 16.1436 6.51808 16.1436H8.88845C9.37937 16.1436 9.77734 16.5415 9.77734 17.0324Z"/></g></svg></button></div>
+<div class="sb-nav">
+<button class="sb-btn" id="bChat" onclick="go('chat')"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M22.104 26.584C20.232 27.688 18.184 28.24 15.96 28.24C13.736 28.24 11.688 27.688 9.816 26.584C7.944 25.496 6.456 24.016 5.352 22.144C4.248 20.272 3.696 18.224 3.696 16C3.696 13.776 4.248 11.728 5.352 9.856C6.456 7.984 7.944 6.496 9.816 5.392C11.688 4.288 13.736 3.736 15.96 3.736C18.184 3.736 20.232 4.288 22.104 5.392C23.976 6.496 25.456 7.984 26.544 9.856C27.648 11.728 28.2 13.776 28.2 16C28.2 18.224 27.648 20.272 26.544 22.144C25.456 24.016 23.976 25.496 22.104 26.584ZM10.824 24.832C12.392 25.744 14.104 26.2 15.96 26.2C17.8 26.2 19.496 25.744 21.048 24.832C22.616 23.92 23.856 22.688 24.768 21.136C25.696 19.568 26.16 17.856 26.16 16C26.16 14.144 25.696 12.44 24.768 10.888C23.856 9.32 22.616 8.08 21.048 7.168C19.496 6.256 17.8 5.8 15.96 5.8C14.104 5.8 12.392 6.256 10.824 7.168C9.272 8.08 8.04 9.32 7.128 10.888C6.216 12.44 5.76 14.144 5.76 16C5.76 17.856 6.216 19.568 7.128 21.136C8.04 22.688 9.272 23.92 10.824 24.832ZM16.776 22.24C16.664 22.352 16.504 22.408 16.296 22.408H15.624C15.416 22.408 15.248 22.352 15.12 22.24C14.992 22.128 14.928 21.968 14.928 21.76V10.24C14.928 10.064 14.984 9.912 15.096 9.784C15.224 9.656 15.392 9.592 15.6 9.592H16.272C16.512 9.592 16.688 9.656 16.8 9.784C16.912 9.896 16.968 10.048 16.968 10.24V21.76C16.968 21.968 16.904 22.128 16.776 22.24ZM22.2 15.16C22.312 15.272 22.368 15.432 22.368 15.64V16.312C22.368 16.52 22.312 16.688 22.2 16.816C22.088 16.944 21.928 17.008 21.72 17.008H10.2C10.024 17.008 9.872 16.952 9.744 16.84C9.616 16.712 9.552 16.544 9.552 16.336V15.664C9.552 15.424 9.608 15.248 9.72 15.136C9.848 15.024 10.008 14.968 10.2 14.968H21.72C21.928 14.968 22.088 15.032 22.2 15.16Z"/></svg><span>新建对话</span></button>
+<button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16.0006 8.0579C16.3615 8.0579 16.5423 8.05765 16.6791 8.12709C16.7995 8.18844 16.8979 8.28683 16.9593 8.40723C17.029 8.54407 17.0296 8.72323 17.0296 9.08133V15.3726H21.9481C22.3062 15.3726 22.4854 15.3722 22.6222 15.4418C22.7426 15.5032 22.841 15.6015 22.9023 15.722C22.9719 15.8588 22.9715 16.0395 22.9715 16.4005C22.9715 16.762 22.9721 16.9433 22.9023 17.0802C22.841 17.2005 22.7425 17.2979 22.6222 17.3592C22.4853 17.4289 22.3063 17.4295 21.9481 17.4295H15.9961C15.7276 17.4295 15.5596 17.4287 15.4347 17.3994C15.3928 17.3896 15.3551 17.3767 15.3209 17.3592C15.2008 17.2979 15.1031 17.2003 15.0419 17.0802C15.0243 17.0458 15.0115 17.0083 15.0017 16.9664C14.9723 16.8409 14.9715 16.6714 14.9715 16.4005V9.08133C14.9715 8.72323 14.9721 8.54407 15.0419 8.40723C15.1032 8.28692 15.2006 8.18844 15.3209 8.12709C15.4578 8.05734 15.6391 8.0579 16.0006 8.0579Z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16.0006 3.71191C22.7858 3.71191 28.2863 9.21242 28.2863 15.9976C28.2863 22.7828 22.7858 28.2833 16.0006 28.2833C9.21535 28.2833 3.71484 22.7828 3.71484 15.9976C3.71484 9.21242 9.21535 3.71191 16.0006 3.71191ZM16.0006 5.76883C10.3515 5.76883 5.77176 10.3485 5.77176 15.9976C5.77176 21.6467 10.3515 26.2264 16.0006 26.2264C21.6496 26.2264 26.2294 21.6467 26.2294 15.9976C26.2294 10.3485 21.6496 5.76883 16.0006 5.76883Z"/></svg><span>任务</span></button>
+<button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9.79" cy="11.2" r="6"/><circle cx="24.11" cy="13.11" r="4.09"/><circle cx="16.8" cy="23.37" r="3.3"/><path d="M12.5 16.18L15.16 20.7"/><path d="M15.52 11.95L20.09 12.53"/></svg><span>跨端执行</span></button>
+<button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M19.86 29.26C19.55 29.31 19.06 29.34 18.42 29.34H10.85C9.89 29.34 9.2 29.32 8.79 29.29C8.37 29.25 8.02 29.17 7.74 29.04C7.16 28.74 6.73 28.31 6.45 27.74C6.3 27.44 6.21 27.09 6.17 26.67C6.14 26.27 6.12 25.59 6.12 24.63V8.8C6.12 7.82 6.14 7.13 6.17 6.74C6.21 6.32 6.3 5.97 6.45 5.69C6.73 5.11 7.16 4.68 7.74 4.4C8.02 4.25 8.37 4.16 8.79 4.12C9.2 4.09 9.89 4.07 10.85 4.07H22.25C23.21 4.07 23.89 4.09 24.29 4.12C24.71 4.16 25.06 4.25 25.36 4.4C25.93 4.68 26.35 5.11 26.63 5.69C26.78 5.97 26.87 6.32 26.9 6.74C26.94 7.13 26.95 7.82 26.95 8.8V20.8C26.95 21.45 26.93 21.92 26.88 22.22C26.85 22.5 26.74 22.78 26.56 23.06C26.37 23.33 26.05 23.69 25.59 24.16L21.78 27.97C21.33 28.41 20.97 28.73 20.71 28.91C20.46 29.09 20.18 29.21 19.86 29.26Z"/></svg><span>文件</span></button>
+<button class="sb-btn on" id="bInsp" onclick="go('insp')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7L2 9.4h7.6z"/></svg><span>灵感广场</span></button>
+<button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16.536 28.24C16.152 28.32 15.768 28.32 15.384 28.24C15.224 28.208 15.04 28.144 14.832 28.048C14.624 27.952 14.4 27.832 14.16 27.688L13.728 27.448L6.984 23.656L6.72 23.512C6.416 23.336 6.152 23.176 5.928 23.032C5.704 22.888 5.528 22.744 5.4 22.6C5.112 22.296 4.912 21.952 4.8 21.568C4.736 21.376 4.696 21.12 4.68 20.8C4.664 20.48 4.656 20.104 4.656 19.672V12.256C4.656 11.824 4.664 11.456 4.68 11.152C4.696 10.832 4.736 10.576 4.8 10.384C4.912 10.016 5.112 9.664 5.4 9.328C5.512 9.2 5.672 9.072 5.88 8.944C6.104 8.8 6.352 8.648 6.624 8.488L6.984 8.296L13.728 4.48C14.08 4.272 14.392 4.104 14.664 3.976C14.952 3.832 15.192 3.744 15.384 3.712C15.768 3.616 16.152 3.616 16.536 3.712C16.728 3.744 16.96 3.832 17.232 3.976C17.52 4.104 17.84 4.272 18.192 4.48L24.936 8.296L25.224 8.464C25.528 8.624 25.784 8.776 25.992 8.92C26.216 9.048 26.392 9.184 26.52 9.328C26.808 9.664 27.008 10.016 27.12 10.384C27.184 10.576 27.224 10.832 27.24 11.152C27.256 11.456 27.264 11.824 27.264 12.256V19.672C27.264 20.104 27.256 20.48 27.24 20.8C27.224 21.12 27.184 21.376 27.12 21.568C27.008 21.952 26.808 22.296 26.52 22.6C26.376 22.76 26.192 22.912 25.968 23.056C25.76 23.184 25.416 23.384 24.936 23.656L18.192 27.448L17.76 27.688C17.52 27.832 17.296 27.952 17.088 28.048C16.88 28.144 16.696 28.208 16.536 28.24ZM18.36 20.128C17.64 20.56 16.84 20.776 15.96 20.776C15.096 20.776 14.296 20.56 13.56 20.128C12.824 19.696 12.24 19.112 11.808 18.376C11.376 17.64 11.16 16.84 11.16 15.976C11.16 15.096 11.376 14.296 11.808 13.576C12.24 12.84 12.824 12.256 13.56 11.824C14.296 11.392 15.096 11.176 15.96 11.176C16.84 11.176 17.64 11.392 18.36 11.824C19.096 12.256 19.68 12.84 20.112 13.576C20.544 14.296 20.76 15.096 20.76 15.976C20.76 16.84 20.544 17.64 20.112 18.376C19.68 19.112 19.096 19.696 18.36 20.128Z"/></svg><span>设置</span></button>
+</div>
+<div class="sb-scr">
+<div class="sb-lbl">对话记录</div>
+<div class="sb-sub">昨天</div>
+<div class="sb-h">手机板书照片整理笔记</div>
+<div class="sb-h">实验课板书整理笔记</div>
+<div class="sb-sub">本周</div>
+<div class="sb-h">给丸子打电话交作业</div>
+<div class="sb-sub">更早</div>
+<div class="sb-h">询问基座模型</div>
+<div class="sb-h">北京明日天气与出行建议</div>
+<div class="sb-h">三亚5天旅游攻略</div>
+<div class="sb-h">今日安排查询</div>
+<div class="sb-h">上周末手机照片</div>
+</div>
+</aside>
+<main class="mc">
+<!-- Inspiration View -->
+<div class="view on" id="inspView">
+<div class="insp-scr">
+<div class="insp-badge">灵感广场</div>
+<h1>探索 MiClaw 能做什么</h1>
+<p class="sub">点击任意灵感卡片，即刻开始一段新对话</p>
+<div class="tabs">
+<button class="tab on" data-c="all">全部</button>
+<button class="tab" data-c="doc">文档处理</button>
+<button class="tab" data-c="create">创意生成</button>
+<button class="tab" data-c="tool">效率工具</button>
+<button class="tab" data-c="device">设备互联</button>
+<button class="tab" data-c="life">生活助手</button>
+</div>
+<div class="grid">
+<div class="card" data-c="doc" data-p="帮我写一份工作周报，包含本周完成的事项、遇到的问题和下周计划，输出为 Word 文档保存到桌面。"><div class="card-em">📄</div><div class="card-t">生成周报</div><div class="card-d">自动生成结构化工作周报，输出 Word</div><div class="card-b bl">docx</div></div>
+<div class="card" data-c="doc" data-p="帮我做一份 PPT，主题是 Q2 季度工作总结，包含封面、目录、核心成果、数据亮点、下季度规划，风格简洁专业。"><div class="card-em">📊</div><div class="card-t">制作 PPT</div><div class="card-d">输入主题即可生成完整演示文稿</div><div class="card-b bl">pptx</div></div>
+<div class="card" data-c="doc" data-p="帮我创建一个项目排期表格，包含任务名称、负责人、开始日期、截止日期、状态，先填入5条示例数据。"><div class="card-em">📋</div><div class="card-t">创建表格</div><div class="card-d">快速生成结构化 Excel 表格</div><div class="card-b bl">xlsx</div></div>
+<div class="card" data-c="doc" data-p="帮我把桌面上最新的 Word 文档转换成 PDF 格式。"><div class="card-em">📑</div><div class="card-t">转换 PDF</div><div class="card-d">Word、Markdown 一键转 PDF</div><div class="card-b bl">pdf</div></div>
+<div class="card" data-c="create" data-p="生成一个网页，中间是一个跳动的爱心，背景是渐变色。"><div class="card-em">❤️</div><div class="card-t">生成网页</div><div class="card-d">描述效果，直接生成可运行的网页</div><div class="card-b pu">frontend</div></div>
+<div class="card" data-c="create" data-p="帮我设计一张活动海报，主题是2026夏日音乐节，风格年轻活力。"><div class="card-em">🎨</div><div class="card-t">设计海报</div><div class="card-d">输入主题和风格，生成精美设计</div><div class="card-b pu">canvas</div></div>
+<div class="card" data-c="create" data-p="帮我做一个贪吃蛇小游戏，要有计分功能和游戏结束画面，像素风。"><div class="card-em">🎮</div><div class="card-t">做个小游戏</div><div class="card-d">描述玩法即可生成网页小游戏</div><div class="card-b pu">game</div></div>
+<div class="card" data-c="create" data-p="帮我生成一张图片：一只橘猫坐在窗台上看夕阳，吉卜力动画风格。"><div class="card-em">🖼️</div><div class="card-t">AI 绘图</div><div class="card-d">描述画面和风格，AI 生成图片</div><div class="card-b pu">seedream</div></div>
+<div class="card" data-c="create" data-p="帮我制作一个 15 秒的产品介绍短视频，展示三个核心功能。"><div class="card-em">🎬</div><div class="card-t">生成视频</div><div class="card-d">文字描述内容，自动生成短视频</div><div class="card-b pu">remotion</div></div>
+<div class="card" data-c="tool" data-p="扫描我的下载文件夹和桌面，把今天新增的文档按类型归类整理。"><div class="card-em">🗂️</div><div class="card-t">整理桌面</div><div class="card-d">扫描文件夹，按类型自动归档</div><div class="card-b gr">local</div></div>
+<div class="card" data-c="tool" data-p="帮我创建一个定时任务：每天早上 9 点自动整理桌面文件。"><div class="card-em">⏰</div><div class="card-t">定时任务</div><div class="card-d">设置周期性自动化任务</div><div class="card-b gr">schedule</div></div>
+<div class="card" data-c="tool" data-p="帮我打开浏览器访问 HackerNews，截取首页截图并总结前5热门话题。"><div class="card-em">🌐</div><div class="card-t">浏览器自动化</div><div class="card-d">自动打开网页、截图、提取信息</div><div class="card-b gr">playwright</div></div>
+<div class="card" data-c="tool" data-p="帮我制定一个为期两周的项目计划，拆解成每日可执行的任务。"><div class="card-em">📐</div><div class="card-t">制定计划</div><div class="card-d">输入目标，自动拆解为每日任务</div><div class="card-b gr">plan</div></div>
+<div class="card" data-c="tool" data-p="帮我把桌面上的 screenshot.png 转换成 JPG，压缩到 500KB 以内。"><div class="card-em">🔄</div><div class="card-t">格式转换</div><div class="card-d">图片文档格式互转，支持压缩</div><div class="card-b gr">convert</div></div>
+<div class="card" data-c="tool" data-p="帮我创建一个新 Skill：每次说日报时自动汇总操作记录生成日报。"><div class="card-em">🧩</div><div class="card-t">创建新技能</div><div class="card-d">教 MiClaw 学会新本领</div><div class="card-b gr">skill</div></div>
+<div class="card" data-c="device" data-p="@手机 帮我把最近拍的照片发到电脑上，我需要做文档配图。"><div class="card-em">📸</div><div class="card-t">手机照片同步</div><div class="card-d">让手机把照片发送到 PC</div><div class="card-b or">跨端</div></div>
+<div class="card" data-c="device" data-p="帮我查看家里的智能设备状态，客厅灯开着就帮我关掉。"><div class="card-em">🏠</div><div class="card-t">智能家居控制</div><div class="card-d">查看并控制米家 IoT 设备</div><div class="card-b or">IoT</div></div>
+<div class="card" data-c="device" data-p="@手机 把电脑剪贴板内容发送到手机上。"><div class="card-em">📋</div><div class="card-t">剪贴板互通</div><div class="card-d">PC 与手机无缝传递内容</div><div class="card-b or">跨端</div></div>
+<div class="card" data-c="device" data-p="帮我把电脑上这份合同 PDF 发送到手机上，出门给客户看。"><div class="card-em">📤</div><div class="card-t">文件互传</div><div class="card-d">跨设备快速传输文件</div><div class="card-b or">跨端</div></div>
+<div class="card" data-c="life" data-p="查一下北京明天的天气，告诉我适合穿什么，要不要带伞？"><div class="card-em">☂️</div><div class="card-t">天气穿搭</div><div class="card-d">查询天气并给出穿搭建议</div><div class="card-b am">weather</div></div>
+<div class="card" data-c="life" data-p="推荐几部最近口碑好的电影，适合周末和朋友看。"><div class="card-em">🎬</div><div class="card-t">找电影</div><div class="card-d">按类型口碑心情推荐电影</div><div class="card-b am">films</div></div>
+<div class="card" data-c="life" data-p="帮我找几首适合工作时听的轻音乐，节奏平稳不分心。"><div class="card-em">🎵</div><div class="card-t">找音乐</div><div class="card-d">按场景心情推荐音乐</div><div class="card-b am">music</div></div>
+<div class="card" data-c="life" data-p="帮我规划周末短途旅行，离北京不远，预算 1000 以内。"><div class="card-em">✈️</div><div class="card-t">周末规划</div><div class="card-d">根据预算偏好规划旅行</div><div class="card-b am">trip</div></div>
+</div>
+</div>
+</div>
+<!-- Chat View: logo centered, input at bottom (matches AgentView.tsx layout) -->
+<div class="view" id="chatView">
+<div class="chat-v">
+<div class="chat-center">
+<div class="chat-logo"><svg viewBox="0 0 24 24" fill="white" width="30" height="30"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+<div class="chat-brand">xiaomi miclaw</div>
+</div>
+<div class="chat-bottom">
+<div class="chat-quick">
+<div class="chat-qb">🗂️ 整理桌面</div>
+<div class="chat-qb">🌤️ 出行建议</div>
+<div class="chat-qb">❤️ 生成网页</div>
+</div>
+<div class="chat-box">
+<div class="plus">+</div>
+<textarea id="chatTA" rows="1" placeholder="输入你想做的事情…"></textarea>
+<button class="chat-send"><svg width="30" height="30" viewBox="0 0 36 36" fill="currentColor"><path d="M18 3.375C26.0772 3.375 32.625 9.92284 32.625 18C32.625 26.0772 26.0772 32.625 18 32.625C9.92284 32.625 3.375 26.0772 3.375 18C3.375 9.92284 9.92284 3.375 18 3.375ZM18.3506 11.5312C18.1167 11.4553 17.8638 11.4564 17.6299 11.5322C17.4306 11.5969 17.297 11.7008 17.2344 11.7539C17.1856 11.7953 17.1398 11.8415 17.1279 11.8535L12.5215 16.4609C12.3119 16.6705 12.2067 16.7752 12.1514 16.8887C12.05 17.0969 12.05 17.3406 12.1514 17.5488C12.2067 17.6623 12.3118 17.7669 12.5215 17.9766C12.7311 18.1862 12.8357 18.2913 12.9492 18.3467C13.1574 18.4481 13.4012 18.4481 13.6094 18.3467C13.7228 18.2913 13.8275 18.1862 14.0371 17.9766L16.918 15.0957V23.2002C16.918 23.4966 16.9178 23.6453 16.959 23.7646C17.0345 23.9834 17.207 24.1549 17.4258 24.2305C17.5452 24.2717 17.6936 24.2725 17.9902 24.2725C18.2868 24.2725 18.4353 24.2716 18.5547 24.2305C18.7735 24.155 18.9459 23.9834 19.0215 23.7646C19.0627 23.6453 19.0625 23.4966 19.0625 23.2002V15.0957L21.9434 17.9766C22.1532 18.1864 22.2585 18.2914 22.3721 18.3467C22.5802 18.448 22.8231 18.448 23.0312 18.3467C23.1448 18.2914 23.2501 18.1864 23.46 17.9766C23.6696 17.767 23.7748 17.6623 23.8301 17.5488C23.9315 17.3406 23.9315 17.0969 23.8301 16.8887C23.7748 16.7752 23.6695 16.6705 23.46 16.4609L18.8555 11.8564C18.8419 11.8418 18.7952 11.7956 18.7461 11.7539C18.6833 11.7006 18.5494 11.5959 18.3506 11.5312Z"/></svg></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<script>
+function go(v){
+  document.getElementById('inspView').classList.toggle('on',v==='insp');
+  document.getElementById('chatView').classList.toggle('on',v==='chat');
+  document.getElementById('bInsp').classList.toggle('on',v==='insp');
+  document.getElementById('bChat').classList.toggle('on',v==='chat');
+}
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    const c=t.dataset.c;
+    document.querySelectorAll('.card').forEach(card=>{
+      card.style.display=(c==='all'||card.dataset.c===c)?'':'none';
+    });
+  });
+});
+document.querySelectorAll('.card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    go('chat');
+    const ta=document.getElementById('chatTA');
+    ta.value=card.dataset.p;
+    ta.style.height='auto';
+    ta.style.height=ta.scrollHeight+'px';
+    ta.focus();
+  });
+});
+document.getElementById('chatTA').addEventListener('input',function(){
+  this.style.height='auto';
+  this.style.height=Math.min(this.scrollHeight,100)+'px';
+});
+go('insp');
+</script>
+</body>
+</html>
