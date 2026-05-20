@@ -773,19 +773,19 @@ function runStep() {
         break;
       case 'processThinking':
         chatArea.innerHTML += createProcessBlock('思考中…', true,
-          createThinkingSubBlock('识别截图内容——老板要求：
+          createThinkingSubBlock(`识别截图内容——老板要求：
 1. 报价调低 10%
 2. 结尾加售后承诺
 
 需要：
 1. 在 PC 本地搜索「方案」相关文件
 2. 打开文档进行修改
-3. 修改完成后传输回手机', true), true);
+3. 修改完成后传输回手机`, true), true);
         break;
       case 'processUpdate1':
         const processWrapper = chatArea.querySelector('.process-wrapper');
         if (processWrapper) {
-          const thinkingContent = createThinkingSubBlock('识别截图内容——老板要求：
+          const thinkingContent = createThinkingSubBlock(`识别截图内容——老板要求：
 1. 报价调低 10%
 2. 结尾加售后承诺
 
@@ -795,7 +795,7 @@ function runStep() {
 3. 修改完成后传输回手机
 
 ✓ 理解需求完成
-→ 正在搜索本地文件…', true);
+→ 正在搜索本地文件…`, true);
           processWrapper.innerHTML = `<div class="process-inner"><div class="process-block" style="opacity:1;animation:none;"><div class="process-block-header"><span class="thinking-icon agent-thinking-progress-icon">${thinkingSvg}</span><span class="process-block-title">思考中…</span><span class="process-chevron expanded">${chevronSvg}</span></div><div class="process-block-content">${thinkingContent}</div></div></div>`;
         }
         break;

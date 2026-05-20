@@ -773,23 +773,23 @@ function runStep() {
         break;
       case 'processThinking':
         chatArea.innerHTML += createProcessBlock('思考中…', true,
-          createThinkingSubBlock('用户需要分析微信收到的购房合同是否存在问题。
+          createThinkingSubBlock(`用户需要分析微信收到的购房合同是否存在问题。
 需要：
 1. 从手机获取微信最近收到的 PDF 文件
 2. PDF 解析 + LLM 逐条款分析
-3. 生成风险报告', true), true);
+3. 生成风险报告`, true), true);
         break;
       case 'processUpdate1':
         const processWrapper = chatArea.querySelector('.process-wrapper');
         if (processWrapper) {
-          const thinkingContent = createThinkingSubBlock('用户需要分析微信收到的购房合同是否存在问题。
+          const thinkingContent = createThinkingSubBlock(`用户需要分析微信收到的购房合同是否存在问题。
 需要：
 1. 从手机获取微信最近收到的 PDF 文件
 2. PDF 解析 + LLM 逐条款分析
 3. 生成风险报告
 
 ✓ 理解需求完成
-→ 正在向手机发送指令…', true);
+→ 正在向手机发送指令…`, true);
           processWrapper.innerHTML = `<div class="process-inner"><div class="process-block" style="opacity:1;animation:none;"><div class="process-block-header"><span class="thinking-icon agent-thinking-progress-icon">${thinkingSvg}</span><span class="process-block-title">思考中…</span><span class="process-chevron expanded">${chevronSvg}</span></div><div class="process-block-content">${thinkingContent}</div></div></div>`;
         }
         break;
