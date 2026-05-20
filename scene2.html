@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>会议录音整理纪要 | PC MiClaw Light Mode</title>
+<style>
+/* ===== tokens.css — CSS Variables (Light Mode) ===== */
+:root {
+  --miclaw-color-background: #f6f7fa;
+  --miclaw-color-surface: #ffffff;
+  --miclaw-color-surface-hover: #eef0f5;
+  --miclaw-color-surface-muted: #f2f3f7;
+  --miclaw-color-surface-inset: #e9ebf0;
+  --miclaw-color-text: #1c1f28;
+  --miclaw-color-text-muted: #636878;
+  --miclaw-color-border: #dde0e8;
+  --miclaw-color-border-light: #e9ebf0;
+  --miclaw-color-accent: #3482ff;
+  --miclaw-color-accent-hover: #2b6fe0;
+  --miclaw-color-accent-muted: rgba(52, 130, 255, 0.1);
+  --miclaw-color-danger: #dc2626;
+  --miclaw-color-warning: #d97706;
+  --miclaw-color-success: #16a34a;
+}
+
+/* ===== index.css — Global Styles ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #1A1D23;
+  background-color: #F2F2F2;
+}
+
+/* Scrollbar — from index.css */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #dde0e8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #636878; }
+</style>
+
+<style>
+/* ===== Agent Thinking Animation — from index.css @keyframes ===== */
+.agent-thinking-progress-icon {
+  color: rgba(0, 0, 0, 0.3);
+  transform-origin: center;
+  animation: agent-thinking-progress 1.2s ease-in-out infinite;
+}
+
+@keyframes agent-thinking-progress {
+  0% { opacity: 0.58; transform: scale(0.92) rotate(-10deg); }
+  50% { opacity: 1; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0.72; transform: scale(0.96) rotate(10deg); }
+}
+
+/* ===== Tailwind keyframes from tailwind.config.js ===== */
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===== Layout — from App.tsx ===== */
+/* h-screen overflow-hidden flex flex-col bg-[#F2F2F2] */
+.app-shell {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #F2F2F2;
+}
+
+/* flex flex-1 min-h-0 overflow-hidden p-2 gap-2 */
+.app-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 8px;
+  gap: 8px;
+}
+</style>
+
+<style>
+/* ===== Sidebar — from Sidebar.tsx ===== */
+/* aside: bg-white rounded-[22px] w-60 */
+.sidebar {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 240px;
+}
+
+.sidebar-header {
+  padding-top: 6px;
+}
+
+.sidebar-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 12px;
+  padding-right: 7px;
+  height: 32px;
+}
+
+/* Collapse button: w-[30px] h-[30px] rounded-full */
+.sidebar-collapse-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #636878;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sidebar-collapse-btn:hover {
+  color: #1c1f28;
+  background: rgba(0,0,0,0.06);
+}
+.sidebar-collapse-btn svg { width: 16px; height: 16px; }
+
+/* Nav buttons area: px-2.5 mt-1.5 */
+.sidebar-nav { padding: 0 10px; margin-top: 6px; }
+
+/* btnBase: w-full inline-flex items-center rounded-xl px-2.5 py-2 text-sm font-medium */
+.nav-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: rgba(0,0,0,0.8);
+  text-align: left;
+}
+.nav-btn:hover {
+  background: rgba(0,0,0,0.05);
+  color: #1c1f28;
+}
+/* active: bg-miclaw-accent/[0.08] text-miclaw-accent */
+.nav-btn.active {
+  background: rgba(52,130,255,0.08);
+  color: #3482ff;
+}
+.nav-btn.active:hover {
+  background: rgba(52,130,255,0.15);
+}
+.nav-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+</style>
+
+<style>
+/* Sidebar scroll area */
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 10px 16px;
+  margin-top: 4px;
+}
+.sidebar-nav-items { display: flex; flex-direction: column; gap: 2px; }
+
+/* History label: text-xs font-medium text-[#8C9DB0] px-2.5 pt-4 pb-2 */
+.history-label {
+  padding: 16px 10px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #8C9DB0;
+}
+
+/* Session item */
+.session-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: rgba(0,0,0,0.8);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-item:hover { background: rgba(0,0,0,0.05); }
+.session-item.active {
+  background: rgba(52,130,255,0.08);
+  color: #3482ff;
+  font-weight: 500;
+}
+
+/* ===== Main Content Area ===== */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+/* Header bar */
+.main-header {
+  display: flex;
+  height: 52px;
+  align-items: center;
+  padding: 0 24px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.main-header-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c1f28;
+}
+
+/* Chat scroll area */
+.chat-area {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+</style>
+
+<style>
+/* ===== UserMessageItem — from AgentSessionDetail.tsx ===== */
+/* py-2 px-4 */
+.user-message-row {
+  padding: 8px 16px;
+  opacity: 0;
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+/* max-w-3xl mx-auto */
+.user-message-container {
+  max-width: 768px;
+  margin: 0 auto;
+}
+/* pl-4 sm:pl-8 md:pl-12 */
+.user-message-inner {
+  padding-left: 48px;
+}
+/* flex items-start gap-3 flex-row-reverse */
+.user-message-flex {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-direction: row-reverse;
+}
+.user-message-content {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+/* max-w-[480px] rounded-2xl px-4 py-3.5 bg-[#D1E3FF] */
+.user-bubble {
+  max-width: 480px;
+  width: fit-content;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #D1E3FF;
+  color: #1c1f28;
+  font-size: 15px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+/* ===== AssistantMessageItem ===== */
+.assistant-message-row {
+  padding: 8px 16px;
+  opacity: 0;
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+.assistant-message-container {
+  max-width: 768px;
+  margin: 0 auto;
+}
+.assistant-message-content {
+  color: #1c1f28;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.assistant-message-content h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: #1c1f28;
+}
+.assistant-message-content h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 12px 0 6px;
+  color: #1c1f28;
+}
+.assistant-message-content ul {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+.assistant-message-content li {
+  margin: 4px 0;
+}
+.assistant-message-content code {
+  background: rgba(221,224,232,0.5);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: 'SF Mono', 'Fira Code', Menlo, Monaco, 'Courier New', monospace;
+}
+</style>
+
+<style>
+/* ===== ProcessBlock — from AgentSessionDetail.tsx ===== */
+/* rounded-lg border border-black/[0.04] bg-black/[0.025] */
+.process-block {
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.04);
+  background: rgba(0,0,0,0.025);
+  overflow: hidden;
+  margin: 8px 0;
+  opacity: 0;
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+/* button: w-full flex items-center gap-1.5 px-3 py-2 */
+.process-block-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.process-block-header:hover {
+  background: rgba(0,0,0,0.03);
+}
+/* ThinkingStatusIcon: h-[18px] w-[18px] */
+.thinking-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* text-xs font-medium leading-none text-miclaw-textSecondary */
+.process-block-title {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: #636878;
+}
+/* ChevronRight: h-3.5 w-3.5 */
+.process-chevron {
+  width: 14px;
+  height: 14px;
+  color: #636878;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.process-chevron.expanded { transform: rotate(90deg); }
+
+/* Process block content: px-3 pb-3 space-y-3 */
+.process-block-content {
+  padding: 0 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== ThinkingSubBlock ===== */
+.thinking-sub-block {
+  overflow: hidden;
+}
+/* button: gap-2 px-2.5 py-1.5 */
+.thinking-sub-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+/* ChevronRight h-3 w-3 */
+.thinking-sub-chevron {
+  width: 12px;
+  height: 12px;
+  color: #636878;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.thinking-sub-chevron.expanded { transform: rotate(90deg); }
+/* text-xs text-miclaw-textSecondary */
+.thinking-sub-label {
+  font-size: 12px;
+  color: #636878;
+}
+/* content: px-2.5 pb-2.5 max-h-64 overflow-y-auto */
+.thinking-sub-content {
+  padding: 0 10px 10px;
+  max-height: 256px;
+  overflow-y: auto;
+}
+/* text-xs leading-relaxed text-miclaw-textSecondary/80 */
+.thinking-sub-text {
+  font-size: 12px;
+  line-height: 1.625;
+  color: rgba(99,104,120,0.8);
+  white-space: pre-wrap;
+}
+</style>
+
+<style>
+/* ===== DeviceProcessBlock — from DeviceProcessBlock.tsx ===== */
+/* my-2 border border-gray-200 rounded-lg overflow-hidden */
+.device-block {
+  margin: 8px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+/* button: gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 */
+.device-block-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.device-block-header:hover { background: #f3f4f6; }
+.device-icon { font-size: 16px; }
+/* text-sm font-medium text-gray-700 flex-1 */
+.device-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  flex: 1;
+}
+/* Running indicator */
+.device-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.device-status.running { color: #3b82f6; }
+.device-status.done { color: #22c55e; }
+.device-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+/* Content: px-3 py-2 space-y-2 */
+.device-block-content {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.device-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #636878;
+}
+.device-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.device-step-dot.done { background: #22c55e; }
+.device-step-dot.running { background: #3b82f6; animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+
+/* ===== Input Area — from AgentPromptInput.tsx ===== */
+.input-area {
+  flex-shrink: 0;
+  padding: 0 16px 16px;
+}
+.input-container-outer {
+  max-width: 768px;
+  margin: 0 auto;
+}
+/* shadow-glow-accent rounded-2xl — from tailwind.config.js */
+.input-glow {
+  box-shadow: 0 0 20px rgba(52,130,255,0.18);
+  border-radius: 16px;
+}
+/* containerClass large: rounded-2xl border bg-miclaw-surface shadow-card */
+.input-box {
+  position: relative;
+  border-radius: 16px;
+  border: 1px solid #dde0e8;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.input-box:focus-within {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.04);
+  border-color: #3482ff;
+}
+</style>
+
+<style>
+/* textarea: text-[15px] leading-6 px-4 pt-2.5 pb-2 */
+.input-textarea {
+  width: 100%;
+  resize: none;
+  background: transparent;
+  padding: 10px 16px 8px;
+  color: #1c1f28;
+  font-size: 15px;
+  line-height: 24px;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  min-height: 60px;
+}
+.input-textarea::placeholder {
+  color: rgba(99,104,120,0.6);
+}
+/* Bottom toolbar */
+.input-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 4px 8px 8px;
+}
+.send-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #3482ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.send-btn:hover { background: rgba(52,130,255,0.08); }
+.send-btn svg { width: 36px; height: 36px; }
+
+/* ===== Animation Utilities ===== */
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+/* Streaming cursor — from StreamingText.tsx: inline-block w-0.5 h-4 bg-current animate-pulse */
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: currentColor;
+  animation: pulse 0.8s cubic-bezier(0.4,0,0.6,1) infinite;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+.hidden { display: none !important; }
+
+/* Process block wrapper in chat */
+.process-wrapper {
+  padding: 8px 16px;
+}
+.process-inner {
+  max-width: 768px;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="app-content">
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-header-inner">
+          <!-- macOS traffic lights -->
+          <div style="display:flex;gap:8px;padding-left:8px;">
+            <span style="width:12px;height:12px;border-radius:50%;background:#FF5F57;"></span>
+            <span style="width:12px;height:12px;border-radius:50%;background:#FEBC2E;"></span>
+            <span style="width:12px;height:12px;border-radius:50%;background:#28C840;"></span>
+          </div>
+          <button class="sidebar-collapse-btn" aria-label="收起">
+            <!-- sidebar.svg -->
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.8"><path d="M27.5569 11.7531C27.5569 10.7705 27.556 10.0862 27.5126 9.55436C27.47 9.03314 27.3912 8.73617 27.2773 8.5127C27.0312 8.02951 26.6381 7.63649 26.1549 7.3903C25.9315 7.27643 25.6345 7.19767 25.1133 7.15506C24.5814 7.1116 23.8972 7.11079 22.9145 7.11079H9.08811C8.10545 7.11079 7.42116 7.1116 6.88932 7.15506C6.3681 7.19767 6.07113 7.27643 5.84766 7.3903C5.36447 7.63649 4.97145 8.02951 4.72526 8.5127C4.61139 8.73617 4.53263 9.03314 4.49002 9.55436C4.44656 10.0862 4.44575 10.7705 4.44575 11.7531V20.0492C4.44575 21.0318 4.44657 21.7153 4.49002 22.2471C4.5326 22.7683 4.61145 23.0652 4.72526 23.2887C4.97143 23.7719 5.36455 24.1649 5.84766 24.4111C6.07114 24.525 6.36808 24.6046 6.88932 24.6472C7.42116 24.6907 8.10545 24.6906 9.08811 24.6906H22.9145C23.8972 24.6906 24.5814 24.6907 25.1133 24.6472C25.6345 24.6046 25.9315 24.525 26.1549 24.4111C26.6381 24.1649 27.0312 23.7719 27.2773 23.2887C27.3912 23.0652 27.47 22.7683 27.5126 22.2471C27.556 21.7153 27.5569 21.0318 27.5569 20.0492V11.7531ZM29.3346 20.0492C29.3346 21.0024 29.335 21.771 29.2843 22.392C29.2327 23.0233 29.1235 23.5802 28.8607 24.096C28.4441 24.9136 27.7798 25.5787 26.9622 25.9953C26.4463 26.2582 25.8888 26.3674 25.2574 26.4189C24.6364 26.4697 23.8677 26.4684 22.9145 26.4684H9.08811C8.13494 26.4684 7.36619 26.4697 6.74523 26.4189C6.11383 26.3674 5.55628 26.2582 5.04036 25.9953C4.22282 25.5787 3.55853 24.9136 3.14193 24.096C2.87908 23.5802 2.76991 23.0233 2.71832 22.392C2.66758 21.771 2.66797 21.0024 2.66797 20.0492V11.7531C2.66797 10.8 2.6676 10.0312 2.71832 9.41026C2.7699 8.77887 2.87905 8.22132 3.14193 7.7054C3.5585 6.88805 4.22301 6.22354 5.04036 5.80697C5.55628 5.54409 6.11383 5.43494 6.74523 5.38336C7.3662 5.33264 8.13492 5.33301 9.08811 5.33301H22.9145C23.8677 5.33301 24.6364 5.33264 25.2574 5.38336C25.8888 5.43494 26.4463 5.54409 26.9622 5.80697C27.7796 6.22354 28.4441 6.88805 28.8607 7.7054C29.1236 8.22132 29.2327 8.77887 29.2843 9.41026C29.335 10.0312 29.3346 10.8 29.3346 11.7531V20.0492Z" fill="currentColor"/><path d="M12.7387 6.22168V25.9257H10.9609V6.22168H12.7387Z" fill="currentColor"/><path d="M9.77734 9.92112C9.77734 10.412 9.37937 10.81 8.88845 10.81H6.51808C6.02716 10.81 5.6292 10.412 5.6292 9.92112C5.6292 9.4302 6.02716 9.03223 6.51809 9.03223H8.88845C9.37937 9.03223 9.77734 9.4302 9.77734 9.92112Z" fill="currentColor"/><path d="M9.77734 13.4768C9.77734 13.9677 9.37937 14.3657 8.88845 14.3657H6.51808C6.02716 14.3657 5.6292 13.9677 5.6292 13.4768C5.6292 12.9859 6.02716 12.5879 6.51808 12.5879H8.88845C9.37937 12.5879 9.77734 12.9859 9.77734 13.4768Z" fill="currentColor"/><path d="M9.77734 17.0324C9.77734 17.5234 9.37937 17.9213 8.88845 17.9213H6.51808C6.02716 17.9213 5.6292 17.5234 5.6292 17.0324C5.6292 16.5415 6.02716 16.1436 6.51808 16.1436H8.88845C9.37937 16.1436 9.77734 16.5415 9.77734 17.0324Z" fill="currentColor"/></g></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- New Chat button: px-2.5 mt-1.5 -->
+      <div class="sidebar-nav">
+        <button class="nav-btn active">
+          <!-- add-circle.svg -->
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M22.104 26.584C20.232 27.688 18.184 28.24 15.96 28.24C13.736 28.24 11.688 27.688 9.816 26.584C7.944 25.496 6.456 24.016 5.352 22.144C4.248 20.272 3.696 18.224 3.696 16C3.696 13.776 4.248 11.728 5.352 9.856C6.456 7.984 7.944 6.496 9.816 5.392C11.688 4.288 13.736 3.736 15.96 3.736C18.184 3.736 20.232 4.288 22.104 5.392C23.976 6.496 25.456 7.984 26.544 9.856C27.648 11.728 28.2 13.776 28.2 16C28.2 18.224 27.648 20.272 26.544 22.144C25.456 24.016 23.976 25.496 22.104 26.584ZM10.824 24.832C12.392 25.744 14.104 26.2 15.96 26.2C17.8 26.2 19.496 25.744 21.048 24.832C22.616 23.92 23.856 22.688 24.768 21.136C25.696 19.568 26.16 17.856 26.16 16C26.16 14.144 25.696 12.44 24.768 10.888C23.856 9.32 22.616 8.08 21.048 7.168C19.496 6.256 17.8 5.8 15.96 5.8C14.104 5.8 12.392 6.256 10.824 7.168C9.272 8.08 8.04 9.32 7.128 10.888C6.216 12.44 5.76 14.144 5.76 16C5.76 17.856 6.216 19.568 7.128 21.136C8.04 22.688 9.272 23.92 10.824 24.832ZM16.776 22.24C16.664 22.352 16.504 22.408 16.296 22.408H15.624C15.416 22.408 15.248 22.352 15.12 22.24C14.992 22.128 14.928 21.968 14.928 21.76V10.24C14.928 10.064 14.984 9.912 15.096 9.784C15.224 9.656 15.392 9.592 15.6 9.592H16.272C16.512 9.592 16.688 9.656 16.8 9.784C16.912 9.896 16.968 10.048 16.968 10.24V21.76C16.968 21.968 16.904 22.128 16.776 22.24ZM22.2 15.16C22.312 15.272 22.368 15.432 22.368 15.64V16.312C22.368 16.52 22.312 16.688 22.2 16.816C22.088 16.944 21.928 17.008 21.72 17.008H10.2C10.024 17.008 9.872 16.952 9.744 16.84C9.616 16.712 9.552 16.544 9.552 16.336V15.664C9.552 15.424 9.608 15.248 9.72 15.136C9.848 15.024 10.008 14.968 10.2 14.968H21.72C21.928 14.968 22.088 15.032 22.2 15.16Z" fill="currentColor"/></svg>
+          <span>新建对话</span>
+        </button>
+      </div>
+
+      <!-- Scrollable nav + history -->
+      <div class="sidebar-scroll">
+        <div class="sidebar-nav-items">
+          <button class="nav-btn">
+            <!-- history.svg -->
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16.0006 8.0579C16.3615 8.0579 16.5423 8.05765 16.6791 8.12709C16.7995 8.18844 16.8979 8.28683 16.9593 8.40723C17.029 8.54407 17.0296 8.72323 17.0296 9.08133V15.3726H21.9481C22.3062 15.3726 22.4854 15.3722 22.6222 15.4418C22.7426 15.5032 22.841 15.6015 22.9023 15.722C22.9719 15.8588 22.9715 16.0395 22.9715 16.4005C22.9715 16.762 22.9721 16.9433 22.9023 17.0802C22.841 17.2005 22.7425 17.2979 22.6222 17.3592C22.4853 17.4289 22.3063 17.4295 21.9481 17.4295H15.9961C15.7276 17.4295 15.5596 17.4287 15.4347 17.3994C15.3928 17.3896 15.3551 17.3767 15.3209 17.3592C15.2008 17.2979 15.1031 17.2003 15.0419 17.0802C15.0243 17.0458 15.0115 17.0083 15.0017 16.9664C14.9723 16.8409 14.9715 16.6714 14.9715 16.4005V9.08133C14.9715 8.72323 14.9721 8.54407 15.0419 8.40723C15.1032 8.28692 15.2006 8.18844 15.3209 8.12709C15.4578 8.05734 15.6391 8.0579 16.0006 8.0579Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16.0006 3.71191C22.7858 3.71191 28.2863 9.21242 28.2863 15.9976C28.2863 22.7828 22.7858 28.2833 16.0006 28.2833C9.21535 28.2833 3.71484 22.7828 3.71484 15.9976C3.71484 9.21242 9.21535 3.71191 16.0006 3.71191ZM16.0006 5.76883C10.3515 5.76883 5.77176 10.3485 5.77176 15.9976C5.77176 21.6467 10.3515 26.2264 16.0006 26.2264C21.6496 26.2264 26.2294 21.6467 26.2294 15.9976C26.2294 10.3485 21.6496 5.76883 16.0006 5.76883Z" fill="currentColor"/></svg>
+            <span>任务</span>
+          </button>
+          <button class="nav-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            <span>跨端执行</span>
+          </button>
+          <button class="nav-btn">
+            <!-- file.svg -->
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M19.8613 29.2604C19.5461 29.3102 19.0649 29.3351 18.4178 29.3351H10.8516C9.88919 29.3351 9.20059 29.3185 8.78578 29.2853C8.37096 29.2521 8.02252 29.1692 7.74045 29.0364C7.1597 28.7378 6.7283 28.3064 6.44622 27.7422C6.29689 27.4436 6.20563 27.0868 6.17245 26.672C6.13926 26.2738 6.12267 25.5935 6.12267 24.6311V8.80178C6.12267 7.82281 6.13926 7.13422 6.17245 6.736C6.20563 6.32118 6.29689 5.97274 6.44622 5.69066C6.7283 5.10992 7.1597 4.67852 7.74045 4.39644C8.02252 4.24711 8.37096 4.15585 8.78578 4.12266C9.20059 4.08948 9.88919 4.07289 10.8516 4.07289H22.2507C23.213 4.07289 23.8933 4.08948 24.2916 4.12266C24.7064 4.15585 25.0631 4.24711 25.3618 4.39644C25.9259 4.67852 26.349 5.10992 26.6311 5.69066C26.7804 5.97274 26.8717 6.32118 26.9049 6.736C26.9381 7.13422 26.9547 7.82281 26.9547 8.80178V20.7982C26.9547 21.4453 26.9298 21.9182 26.88 22.2169C26.8468 22.499 26.739 22.781 26.5564 23.0631C26.3739 23.3286 26.0504 23.6936 25.5858 24.1582L21.7778 27.9662C21.3298 28.4142 20.973 28.7295 20.7076 28.912C20.4587 29.0945 20.1766 29.2107 19.8613 29.2604ZM19.8613 22.416C19.6456 22.6317 19.5378 23.0216 19.5378 23.5858V27.0204L24.4907 22.0924H21.0311C20.4836 22.0924 20.0936 22.2003 19.8613 22.416ZM9.38311 27.1947C9.59882 27.2113 9.8477 27.2196 10.1298 27.2196H17.3973V24.3822C17.3973 23.6024 17.4056 23.0465 17.4222 22.7147C17.4554 22.3662 17.5218 22.0759 17.6213 21.8436C17.7707 21.4619 17.9864 21.1301 18.2684 20.848C18.5671 20.5659 18.899 20.3502 19.264 20.2009C19.4963 20.1013 19.7784 20.0433 20.1102 20.0267C20.4587 19.9935 21.0228 19.9769 21.8027 19.9769H24.8391V8.08C24.8391 7.79792 24.8308 7.54903 24.8142 7.33333C24.7976 7.11763 24.7644 6.9517 24.7147 6.83555C24.5819 6.60326 24.4077 6.43733 24.192 6.33778C24.0759 6.2714 23.9099 6.22992 23.6942 6.21333C23.4951 6.19674 23.2462 6.18844 22.9476 6.18844H10.1298H9.90578C9.69008 6.18844 9.49096 6.19674 9.30845 6.21333C9.14252 6.22992 9.00148 6.2714 8.88533 6.33778C8.65304 6.43733 8.48711 6.60326 8.38756 6.83555C8.32119 6.9517 8.2797 7.11763 8.26311 7.33333C8.24652 7.54903 8.23822 7.79792 8.23822 8.08V25.328C8.23822 25.6101 8.24652 25.859 8.26311 26.0747C8.2797 26.2904 8.32119 26.4563 8.38756 26.5724C8.48711 26.8047 8.65304 26.9707 8.88533 27.0702C9.01808 27.1366 9.184 27.1781 9.38311 27.1947ZM18.2187 18.1849C18.0859 18.301 17.8702 18.3591 17.5716 18.3591H11.7724C11.4738 18.3591 11.2581 18.301 11.1253 18.1849C10.9926 18.0687 10.9262 17.8696 10.9262 17.5876V17.0151C10.9262 16.7164 10.9926 16.5173 11.1253 16.4178C11.2581 16.3016 11.4738 16.2436 11.7724 16.2436H17.5716C17.8536 16.2436 18.061 16.3016 18.1938 16.4178C18.3431 16.5173 18.4178 16.6999 18.4178 16.9653V17.5876C18.4178 17.8696 18.3514 18.0687 18.2187 18.1849ZM21.952 12.4356C21.8193 12.5517 21.6119 12.6098 21.3298 12.6098H11.7227C11.4738 12.6098 11.2747 12.5517 11.1253 12.4356C10.9926 12.3194 10.9262 12.1203 10.9262 11.8382V11.216C10.9262 10.9671 10.9926 10.7846 11.1253 10.6684C11.2581 10.5523 11.4572 10.4942 11.7227 10.4942H21.3298C21.6119 10.4942 21.8193 10.5523 21.952 10.6684C22.0847 10.768 22.1511 10.9505 22.1511 11.216V11.8382C22.1511 12.1203 22.0847 12.3194 21.952 12.4356Z" fill="currentColor"/></svg>
+            <span>文件</span>
+          </button>
+          <button class="nav-btn">
+            <!-- settings.svg -->
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16.536 28.24C16.152 28.32 15.768 28.32 15.384 28.24C15.224 28.208 15.04 28.144 14.832 28.048C14.624 27.952 14.4 27.832 14.16 27.688L13.728 27.448L6.984 23.656L6.72 23.512C6.416 23.336 6.152 23.176 5.928 23.032C5.704 22.888 5.528 22.744 5.4 22.6C5.112 22.296 4.912 21.952 4.8 21.568C4.736 21.376 4.696 21.12 4.68 20.8C4.664 20.48 4.656 20.104 4.656 19.672V12.256C4.656 11.824 4.664 11.456 4.68 11.152C4.696 10.832 4.736 10.576 4.8 10.384C4.912 10.016 5.112 9.664 5.4 9.328C5.512 9.2 5.672 9.072 5.88 8.944C6.104 8.8 6.352 8.648 6.624 8.488C6.752 8.424 6.872 8.36 6.984 8.296L13.728 4.48C14.08 4.272 14.392 4.104 14.664 3.976C14.952 3.832 15.192 3.744 15.384 3.712C15.768 3.616 16.152 3.616 16.536 3.712C16.728 3.744 16.96 3.832 17.232 3.976C17.52 4.104 17.84 4.272 18.192 4.48L24.936 8.296L25.224 8.464C25.528 8.624 25.784 8.776 25.992 8.92C26.216 9.048 26.392 9.184 26.52 9.328C26.808 9.664 27.008 10.016 27.12 10.384C27.184 10.576 27.224 10.832 27.24 11.152C27.256 11.456 27.264 11.824 27.264 12.256V19.672C27.264 20.104 27.256 20.48 27.24 20.8C27.224 21.12 27.184 21.376 27.12 21.568C27.008 21.952 26.808 22.296 26.52 22.6C26.376 22.76 26.192 22.912 25.968 23.056C25.76 23.184 25.416 23.384 24.936 23.656L18.192 27.448L17.76 27.688C17.52 27.832 17.296 27.952 17.088 28.048C16.88 28.144 16.696 28.208 16.536 28.24ZM6.864 21.088C6.976 21.248 7.176 21.408 7.464 21.568L15.192 25.936C15.512 26.112 15.768 26.2 15.96 26.2C16.168 26.2 16.424 26.112 16.728 25.936L24.648 21.448C24.872 21.32 25.024 21.168 25.104 20.992C25.184 20.8 25.224 20.552 25.224 20.248V11.872C25.224 11.408 25.168 11.08 25.056 10.888C24.944 10.696 24.688 10.488 24.288 10.264L16.608 5.944C16.336 5.8 16.104 5.736 15.912 5.752C15.736 5.752 15.496 5.84 15.192 6.016L7.392 10.408C7.152 10.552 6.976 10.712 6.864 10.888C6.768 11.048 6.72 11.24 6.72 11.464V20.32C6.72 20.656 6.768 20.912 6.864 21.088ZM18.36 20.128C17.64 20.56 16.84 20.776 15.96 20.776C15.096 20.776 14.296 20.56 13.56 20.128C12.824 19.696 12.24 19.112 11.808 18.376C11.376 17.64 11.16 16.84 11.16 15.976C11.16 15.096 11.376 14.296 11.808 13.576C12.24 12.84 12.824 12.256 13.56 11.824C14.296 11.392 15.096 11.176 15.96 11.176C16.84 11.176 17.64 11.392 18.36 11.824C19.096 12.256 19.68 12.84 20.112 13.576C20.544 14.296 20.76 15.096 20.76 15.976C20.76 16.84 20.544 17.64 20.112 18.376C19.68 19.112 19.096 19.696 18.36 20.128ZM14.064 17.872C14.592 18.4 15.224 18.664 15.96 18.664C16.712 18.664 17.344 18.4 17.856 17.872C18.384 17.344 18.648 16.712 18.648 15.976C18.648 15.224 18.384 14.592 17.856 14.08C17.344 13.552 16.712 13.288 15.96 13.288C15.224 13.288 14.592 13.552 14.064 14.08C13.536 14.592 13.272 15.224 13.272 15.976C13.272 16.712 13.536 17.344 14.064 17.872Z" fill="currentColor"/></svg>
+            <span>设置</span>
+          </button>
+        </div>
+
+        <!-- History section -->
+        <div class="history-label">对话记录</div>
+        <div style="font-size:11px;color:#8C9DB0;font-weight:500;padding:8px 10px 4px;">本周</div>
+        <div class="sidebar-nav-items">
+          <button class="session-item active" style="border-left:3px solid #3482ff;padding-left:7px;">会议录音整理纪要</button>
+        </div>
+        <div style="font-size:11px;color:#8C9DB0;font-weight:500;padding:12px 10px 4px;">更早</div>
+        <div class="sidebar-nav-items">
+          <button class="session-item">帮我写一封邮件</button>
+          <button class="session-item">周末出行计划</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===== Main Content ===== -->
+    <div class="main-content">
+      <!-- Header -->
+      <div class="main-header">
+        <span class="main-header-title">会议录音整理纪要</span>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="chat-area" id="chatArea">
+        <!-- Messages will be injected by JS -->
+      </div>
+
+      <!-- Input Area -->
+      <div class="input-area">
+        <div class="input-container-outer">
+          <div class="input-glow">
+            <div class="input-box">
+              <textarea class="input-textarea" placeholder="输入你的任务..." rows="1"></textarea>
+              <div class="input-toolbar">
+                <button class="send-btn" aria-label="发送">
+                  <!-- action-send.svg -->
+                  <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M18 3.375C26.0772 3.375 32.625 9.92284 32.625 18C32.625 26.0772 26.0772 32.625 18 32.625C9.92284 32.625 3.375 26.0772 3.375 18C3.375 9.92284 9.92284 3.375 18 3.375ZM18.3506 11.5312C18.1167 11.4553 17.8638 11.4564 17.6299 11.5322H17.6289C17.4306 11.5969 17.297 11.7008 17.2344 11.7539C17.1856 11.7953 17.1398 11.8415 17.1279 11.8535L17.126 11.8564L12.5215 16.4609C12.3119 16.6705 12.2067 16.7752 12.1514 16.8887C12.05 17.0969 12.05 17.3406 12.1514 17.5488C12.2067 17.6623 12.3118 17.7669 12.5215 17.9766C12.7311 18.1862 12.8357 18.2913 12.9492 18.3467C13.1574 18.4481 13.4012 18.4481 13.6094 18.3467C13.7228 18.2913 13.8275 18.1862 14.0371 17.9766L16.918 15.0957V23.2002C16.918 23.4966 16.9178 23.6453 16.959 23.7646C17.0345 23.9834 17.207 24.1549 17.4258 24.2305C17.5452 24.2717 17.6936 24.2725 17.9902 24.2725C18.2868 24.2725 18.4353 24.2716 18.5547 24.2305C18.7735 24.155 18.9459 23.9834 19.0215 23.7646C19.0627 23.6453 19.0625 23.4966 19.0625 23.2002V15.0957L21.9434 17.9766C22.1532 18.1864 22.2585 18.2914 22.3721 18.3467C22.5802 18.448 22.8231 18.448 23.0312 18.3467C23.1448 18.2914 23.2501 18.1864 23.46 17.9766C23.6696 17.767 23.7748 17.6623 23.8301 17.5488C23.9315 17.3406 23.9315 17.0969 23.8301 16.8887C23.7748 16.7752 23.6695 16.6705 23.46 16.4609L18.8555 11.8564L18.8535 11.8535C18.8419 11.8418 18.7952 11.7956 18.7461 11.7539C18.6833 11.7006 18.5494 11.5959 18.3506 11.5312Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== Demo Animation Script =====
+const chatArea = document.getElementById('chatArea');
+
+const thinkingSvg = `<svg width="18" height="18" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.85055 18.3827C4.86853 18.2788 5.0182 18.2787 5.0361 18.3827C5.44225 20.7646 7.32075 22.6231 9.707 23.0028L9.80465 23.0184C9.91283 23.0356 9.91283 23.1916 9.80465 23.2089L9.707 23.2235C7.3208 23.6032 5.44231 25.4618 5.0361 27.8436C5.01833 27.9478 4.86832 27.9478 4.85055 27.8436C4.44438 25.4618 2.56491 23.6032 0.178675 23.2235L0.0810187 23.2089C-0.0270391 23.1916 -0.0269734 23.0358 0.0810187 23.0184L0.178675 23.0028C2.56492 22.6231 4.44439 20.7646 4.85055 18.3827ZM14.4931 0.206903C14.5402 -0.0689678 14.9363 -0.0689678 14.9834 0.206903C16.0586 6.51182 21.0331 11.4304 27.3496 12.4354L27.6084 12.4764C27.8947 12.522 27.8947 12.9348 27.6084 12.9803L27.3496 13.0214C21.033 14.0264 16.0585 18.9448 14.9834 25.2499C14.9363 25.5257 14.5402 25.5257 14.4931 25.2499C13.418 18.9449 8.44445 14.0264 2.12789 13.0214L1.8691 12.9803C1.58274 12.9348 1.58274 12.522 1.8691 12.4764L2.12789 12.4354C8.44437 11.4304 13.4179 6.51177 14.4931 0.206903Z" fill="currentColor"/></svg>`;
+const chevronSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+const chevronSmall = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+const checkSvg = `<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>`;
+
+function createUserMessage(text) {
+  return `<div class="user-message-row"><div class="user-message-container"><div class="user-message-inner"><div class="user-message-flex"><div class="user-message-content"><div class="user-bubble">${text}</div></div></div></div></div></div>`;
+}
+
+function createProcessBlock(title, isStreaming, content, expanded) {
+  const iconClass = isStreaming ? 'agent-thinking-progress-icon' : '';
+  const iconStyle = isStreaming ? '' : 'color:rgba(0,0,0,0.3)';
+  const chevronHtml = content ? `<span class="process-chevron ${expanded ? 'expanded' : ''}">${chevronSvg}</span>` : '';
+  const contentHtml = (content && expanded) ? `<div class="process-block-content">${content}</div>` : '';
+  return `<div class="process-wrapper"><div class="process-inner"><div class="process-block"><div class="process-block-header"><span class="thinking-icon ${iconClass}" style="${iconStyle}">${thinkingSvg}</span><span class="process-block-title">${title}</span>${chevronHtml}</div>${contentHtml}</div></div></div>`;
+}
+
+function createDeviceBlock(deviceName, emoji, isRunning, steps) {
+  const statusHtml = isRunning 
+    ? `<span class="device-status running"><span class="device-status-dot"></span>执行中</span>`
+    : `<span class="device-status done">${checkSvg} 完成</span>`;
+  const stepsHtml = steps.map(s => {
+    const dotClass = s.done ? 'done' : 'running';
+    return `<div class="device-step"><span class="device-step-dot ${dotClass}"></span>${s.text}</div>`;
+  }).join('');
+  return `<div class="device-block"><div class="device-block-header"><span class="device-icon">${emoji}</span><span class="device-name">${deviceName}</span>${statusHtml}</div><div class="device-block-content">${stepsHtml}</div></div>`;
+}
+
+function createThinkingSubBlock(text, expanded) {
+  const chevClass = expanded ? 'expanded' : '';
+  const contentHtml = expanded ? `<div class="thinking-sub-content"><div class="thinking-sub-text">${text}</div></div>` : '';
+  return `<div class="thinking-sub-block"><div class="thinking-sub-header"><span class="thinking-sub-chevron ${chevClass}">${chevronSmall}</span><span class="thinking-sub-label">推理过程</span></div>${contentHtml}</div>`;
+}
+
+// ===== Timeline Animation =====
+const timeline = [
+  { delay: 800, action: 'userMessage' },
+  { delay: 1200, action: 'processThinking' },
+  { delay: 1500, action: 'processUpdate1' },
+  { delay: 2000, action: 'deviceAppear' },
+  { delay: 2000, action: 'deviceFound' },
+  { delay: 1800, action: 'deviceTransfer' },
+  { delay: 2000, action: 'pcASR' },
+  { delay: 2000, action: 'pcGenerate' },
+  { delay: 500, action: 'complete' },
+];
+
+let currentStep = 0;
+
+function scrollToBottom() {
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function runStep() {
+  if (currentStep >= timeline.length) return;
+  const step = timeline[currentStep];
+  
+  setTimeout(() => {
+    switch(step.action) {
+      case 'userMessage':
+        chatArea.innerHTML += createUserMessage('刚才的会议录音整理一下，生成纪要');
+        break;
+
+      case 'processThinking':
+        chatArea.innerHTML += createProcessBlock(
+          '思考中…',
+          true,
+          createThinkingSubBlock('用户需要将刚才的会议录音整理成会议纪要。\n需要：\n1. 从手机获取最近的录音文件\n2. ASR 语音转文字（区分说话人）\n3. 生成结构化会议纪要', true),
+          true
+        );
+        break;
+
+      case 'processUpdate1':
+        const processWrapper = chatArea.querySelector('.process-wrapper');
+        if (processWrapper) {
+          const thinkingContent = createThinkingSubBlock('用户需要将刚才的会议录音整理成会议纪要。\n需要：\n1. 从手机获取最近的录音文件\n2. ASR 语音转文字（区分说话人）\n3. 生成结构化会议纪要\n\n✓ 理解需求完成\n→ 正在向手机发送指令…', true);
+          processWrapper.innerHTML = `<div class="process-inner"><div class="process-block" style="opacity:1;animation:none;"><div class="process-block-header"><span class="thinking-icon agent-thinking-progress-icon">${thinkingSvg}</span><span class="process-block-title">思考中…</span><span class="process-chevron expanded">${chevronSvg}</span></div><div class="process-block-content">${thinkingContent}</div></div></div>`;
+        }
+        break;
+
+      case 'deviceAppear':
+        const pb1 = chatArea.querySelector('.process-block-content');
+        if (pb1) {
+          pb1.innerHTML += createDeviceBlock('小米14 Ultra', '📱', true, [
+            { text: '正在搜索最近的录音文件…', done: false }
+          ]);
+        }
+        break;
+
+      case 'deviceFound':
+        const db1 = chatArea.querySelector('.device-block');
+        if (db1) {
+          const content = db1.querySelector('.device-block-content');
+          content.innerHTML = `
+            <div class="device-step"><span class="device-step-dot done"></span>找到 1 个录音文件（45分钟）</div>
+            <div class="device-step"><span class="device-step-dot running"></span>正在传输录音到 PC…</div>
+          `;
+        }
+        break;
+
+      case 'deviceTransfer':
+        const db2 = chatArea.querySelector('.device-block');
+        if (db2) {
+          const content = db2.querySelector('.device-block-content');
+          content.innerHTML = `
+            <div class="device-step"><span class="device-step-dot done"></span>找到 1 个录音文件（45分钟）</div>
+            <div class="device-step"><span class="device-step-dot done"></span>录音传输完成</div>
+          `;
+          const header = db2.querySelector('.device-block-header');
+          const status = header.querySelector('.device-status');
+          status.outerHTML = `<span class="device-status done">${checkSvg} 完成</span>`;
+        }
+        break;
+
+      case 'pcASR':
+        const pb2 = chatArea.querySelector('.process-block-content');
+        if (pb2) {
+          pb2.innerHTML += createDeviceBlock('PC', '💻', true, [
+            { text: 'ASR 语音转文字中（区分说话人）…', done: false }
+          ]);
+        }
+        break;
+
+      case 'pcGenerate':
+        const allDeviceBlocks = chatArea.querySelectorAll('.device-block');
+        const pcBlock = allDeviceBlocks[allDeviceBlocks.length - 1];
+        if (pcBlock) {
+          const content = pcBlock.querySelector('.device-block-content');
+          content.innerHTML = `
+            <div class="device-step"><span class="device-step-dot done"></span>ASR 转写完成（区分 4 位说话人）</div>
+            <div class="device-step"><span class="device-step-dot running"></span>正在生成结构化纪要…</div>
+          `;
+        }
+        break;
+
+      case 'complete':
+        const pw = chatArea.querySelector('.process-wrapper');
+        if (pw) {
+          pw.innerHTML = `<div class="process-inner"><div class="process-block" style="opacity:1;animation:none;"><div class="process-block-header"><span class="thinking-icon" style="color:rgba(0,0,0,0.3)">${thinkingSvg}</span><span class="process-block-title">思考完成</span><span class="process-chevron">${chevronSvg}</span></div></div></div>`;
+        }
+        const streamContainer = document.createElement('div');
+        streamContainer.className = 'assistant-message-row';
+        streamContainer.style.opacity = '1';
+        streamContainer.style.animation = 'none';
+        streamContainer.innerHTML = `<div class="assistant-message-container"><div class="assistant-message-content" id="streamTarget"><span class="streaming-cursor"></span></div></div>`;
+        chatArea.appendChild(streamContainer);
+        scrollToBottom();
+        
+        const textContent = `找到了刚才45分钟的需求评审会录音，已转写并整理成会议纪要。`;
+        const target = document.getElementById('streamTarget');
+        let charIndex = 0;
+        const CHUNK_SIZE = 2;
+        const TICK_MS = 30;
+        
+        function streamTick() {
+          if (charIndex >= textContent.length) {
+            target.innerHTML = textContent + `
+              <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:12px;border:1px solid #dde0e8;background:#ffffff;max-width:420px;cursor:pointer;transition:background 0.15s;">
+                <div style="display:flex;align-items:center;overflow:hidden;flex:1;padding-right:12px;">
+                  <div style="width:40px;height:40px;border-radius:8px;background:#4285f4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="white" stroke-width="1.5" fill="none"/></svg>
+                  </div>
+                  <div style="margin-left:12px;overflow:hidden;flex:1;">
+                    <p style="font-size:14px;font-weight:500;color:#1c1f28;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">需求评审会纪要.md</p>
+                    <p style="font-size:12px;color:#636878;margin:0;">AI 生成</p>
+                  </div>
+                </div>
+                <div style="flex-shrink:0;margin-left:8px;">
+                  <div style="width:32px;height:32px;border-radius:8px;border:1px solid #dde0e8;display:flex;align-items:center;justify-content:center;color:#636878;cursor:pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                  </div>
+                </div>
+              </div>
+            `;
+            scrollToBottom();
+            return;
+          }
+          charIndex = Math.min(charIndex + CHUNK_SIZE, textContent.length);
+          target.innerHTML = textContent.substring(0, charIndex) + '<span class="streaming-cursor"></span>';
+          scrollToBottom();
+          setTimeout(streamTick, TICK_MS);
+        }
+        
+        setTimeout(streamTick, 200);
+        break;
+    }
+    
+    scrollToBottom();
+    currentStep++;
+    runStep();
+  }, step.delay);
+}
+
+setTimeout(runStep, 500);
+</script>
+</body>
+</html>
