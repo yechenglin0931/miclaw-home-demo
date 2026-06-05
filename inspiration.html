@@ -87,7 +87,7 @@ body{font-family:var(--font);background:#E8EBF0;color:var(--text);-webkit-font-s
 <button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M22.104 26.584C20.232 27.688 18.184 28.24 15.96 28.24C13.736 28.24 11.688 27.688 9.816 26.584C7.944 25.496 6.456 24.016 5.352 22.144C4.248 20.272 3.696 18.224 3.696 16C3.696 13.776 4.248 11.728 5.352 9.856C6.456 7.984 7.944 6.496 9.816 5.392C11.688 4.288 13.736 3.736 15.96 3.736C18.184 3.736 20.232 4.288 22.104 5.392C23.976 6.496 25.456 7.984 26.544 9.856C27.648 11.728 28.2 13.776 28.2 16C28.2 18.224 27.648 20.272 26.544 22.144C25.456 24.016 23.976 25.496 22.104 26.584Z"/></svg><span>新建对话</span></button>
 <button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16 3.7C22.8 3.7 28.3 9.2 28.3 16s-5.5 12.3-12.3 12.3S3.7 22.8 3.7 16 9.2 3.7 16 3.7z"/></svg><span>任务</span></button>
 <button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="11" r="5.5"/><circle cx="23" cy="13" r="3.8"/><circle cx="16" cy="23" r="3"/></svg><span>跨端执行</span></button>
-<button class="sb-btn on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7L2 9.4h7.6z"/></svg><span>灵感广场</span></button>
+<button class="sb-btn on" id="btnInsp" onclick="backToInspiration()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7L12 16.4 5.7 21l2.3-7L2 9.4h7.6z"/></svg><span>灵感广场</span></button>
 <button class="sb-btn"><svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16.5 28.2c-.4.1-.8.1-1.2 0-.2 0-.4-.1-.6-.2l-.5-.3L7 23.7l-.3-.2c-.3-.2-.6-.3-.8-.5-.2-.1-.4-.3-.5-.4-.3-.3-.5-.6-.6-1a3 3 0 01-.1-.8V12.3c0-.4 0-.8.1-1.1 0-.3.1-.6.2-.8.1-.4.3-.7.6-1 .1-.1.3-.3.5-.4.2-.1.5-.3.7-.4l.4-.2 6.7-3.8c.4-.2.7-.4 1-.5.3-.1.5-.2.7-.3.4-.1.8-.1 1.2 0 .2 0 .4.1.7.3.3.1.6.3 1 .5l6.7 3.8.3.2c.3.2.6.3.8.5.2.1.4.3.5.4.3.3.5.7.6 1 .1.2.1.5.1.8v8.5c0 .4 0 .8-.1 1.1 0 .3-.1.6-.2.8-.1.4-.3.7-.6 1-.1.2-.3.3-.5.4-.2.1-.6.3-1.1.6l-6.7 3.8-.4.2c-.2.1-.5.3-.7.4-.2.1-.4.2-.6.2z"/></svg><span>设置</span></button>
 </div>
 <div class="sb-scr">
@@ -236,8 +236,13 @@ function tryIt(idx){
   ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
   ta.focus();
   // 侧边栏高亮切换
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('on'));
-  document.querySelectorAll('.sb-btn')[0].classList.add('on');
+  document.getElementById('btnInsp').classList.remove('on');
+}
+
+function backToInspiration(){
+  document.querySelector('.insp-scr').style.display = '';
+  document.getElementById('chatView').style.display = 'none';
+  document.getElementById('btnInsp').classList.add('on');
 }
 
 // Close modal on overlay click
