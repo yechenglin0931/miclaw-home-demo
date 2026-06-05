@@ -5,312 +5,365 @@
 <title>多设备 Session 同步 — PRD 网页版</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#1a1a1a;--surface:#2a2a2a;--text:#fff;--textSec:#999;--accent:#3B82F6;--font:'MiSans',-apple-system,system-ui,sans-serif}
+:root{--bg:#1a1a1a;--text:#fff;--textSec:#888;--accent:#3B82F6;--font:-apple-system,'MiSans',system-ui,sans-serif}
 html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6}
-.container{max-width:1400px;margin:0 auto;padding:40px 60px}
-h1{font-size:48px;font-weight:700;margin-bottom:16px}
-h2{font-size:32px;font-weight:700;margin:60px 0 24px;padding-top:40px;border-top:1px solid #333}
-h3{font-size:22px;font-weight:600;margin:32px 0 16px;color:#ccc}
-p{font-size:16px;color:var(--textSec);margin-bottom:12px;max-width:800px}
-.highlight{color:#FF6927;font-weight:600}
-.section-label{display:inline-block;font-size:12px;font-weight:600;color:var(--accent);background:rgba(59,130,246,0.1);padding:4px 12px;border-radius:12px;margin-bottom:12px}
+.container{max-width:1200px;margin:0 auto;padding:40px 48px 80px}
+h1{font-size:42px;font-weight:700;margin-bottom:8px}
+h2{font-size:28px;font-weight:700;margin:56px 0 20px;padding-top:32px;border-top:1px solid #333}
+h3{font-size:18px;font-weight:600;margin:28px 0 12px;color:#bbb}
+p.desc{font-size:15px;color:var(--textSec);margin-bottom:16px;max-width:700px}
+.label{display:inline-block;font-size:11px;font-weight:600;color:var(--accent);background:rgba(59,130,246,0.1);padding:3px 10px;border-radius:10px;margin-bottom:10px}
+.callout{background:rgba(59,130,246,0.06);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:13px;color:#ccc;line-height:1.8}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+th,td{padding:8px 12px;border:1px solid #333;text-align:left}
+th{background:#222;font-weight:600;color:#ddd}
+td{color:#aaa}
 
-/* PC Frame */
-.pc-frame{width:100%;max-width:1000px;height:668px;background:#F2F2F2;border-radius:24px;position:relative;overflow:hidden;margin:24px 0;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-.pc-sidebar{position:absolute;left:8px;top:8px;width:220px;height:calc(100% - 16px);background:#fff;border-radius:18px;padding:16px 12px}
-.pc-sidebar .nav-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;font-size:13px;color:#5F6577;cursor:pointer;margin-bottom:2px}
-.pc-sidebar .nav-item.active{background:rgba(59,130,246,0.08);color:var(--accent)}
-.pc-sidebar .nav-item:hover{background:#f0f0f0}
-.pc-content{position:absolute;left:240px;top:0;right:0;bottom:0;padding:24px}
-.pc-title{font-size:18px;font-weight:500;color:#000;margin-bottom:16px}
-.pc-subtitle{font-size:12px;color:#757575}
+/* === macOS Window === */
+.mac-win{background:#F2F2F2;border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.4);margin:20px 0}
+.mac-titlebar{height:36px;background:#F2F2F2;display:flex;align-items:center;padding:0 12px;gap:6px;border-bottom:1px solid #e0e0e0}
+.mac-dot{width:10px;height:10px;border-radius:50%}
+.mac-dot.r{background:#FF5F57}.mac-dot.y{background:#FEBC2E}.mac-dot.g{background:#28C840}
+.mac-body{display:flex;min-height:500px}
 
-/* Phone Frame */
-.phone-frame{width:280px;height:608px;background:#F3F3F3;border-radius:42px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);flex-shrink:0}
-.phone-status{height:33px;background:#F2F2F2;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:9px;color:#000}
-.phone-nav{height:40px;display:flex;align-items:center;padding:0 12px;font-size:14px;font-weight:500;color:#000;background:#F2F2F2}
-.phone-content{padding:12px 14px;flex:1;overflow-y:auto}
-.phone-bottom{position:absolute;bottom:0;left:0;right:0;height:72px;background:#F3F3F3;display:flex;align-items:center;justify-content:space-around;border-top:1px solid #e5e5e5}
-.phone-home-bar{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:86px;height:3px;background:#000;border-radius:2px}
+/* Sidebar */
+.sidebar{width:200px;background:#fff;border-right:1px solid #eee;padding:12px 10px;display:flex;flex-direction:column;border-radius:0 0 0 12px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:13px;color:#555;cursor:pointer;margin-bottom:1px}
+.sb-item:hover{background:#f5f5f5}
+.sb-item.active{background:rgba(59,130,246,0.08);color:var(--accent);font-weight:500}
+.sb-item .icon{width:16px;text-align:center;font-size:13px}
+.sb-sep{font-size:10px;color:#aaa;padding:12px 10px 4px;font-weight:500}
+.sb-hist{font-size:12px;color:#666;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-hist:hover{background:#f5f5f5}
 
-/* Device Card */
-.device-card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
-.device-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#10b981);display:flex;align-items:center;justify-content:center;font-size:16px}
-.device-info h4{font-size:13px;font-weight:500;color:#1a1d26}
-.device-info p{font-size:11px;color:#999;margin:0}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;margin-left:auto}
+/* Content */
+.content{flex:1;padding:20px 24px;position:relative;overflow-y:auto}
+.content-title{font-size:20px;font-weight:600;color:#000;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.content-title .add-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:16px;color:#999;cursor:pointer}
 
-/* File Card */
-.file-card{background:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;margin:8px 0}
-.file-icon{width:28px;height:28px;border-radius:6px;background:#E8F0FE;display:flex;align-items:center;justify-content:center;font-size:14px}
-.file-info{flex:1}
-.file-info .name{font-size:12px;font-weight:500;color:#1a1d26}
-.file-info .meta{font-size:10px;color:#999}
-.file-download{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--accent)}
+/* Device Group */
+.device-group{margin-bottom:20px}
+.device-header{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;margin-bottom:8px}
+.device-icon{width:28px;height:28px;border-radius:6px;background:#E8EAF0;display:flex;align-items:center;justify-content:center;font-size:14px}
+.device-name{font-size:14px;font-weight:500;color:#1a1d26}
+.device-status{font-size:11px;color:#22c55e;margin-left:4px}
+.device-status.offline{color:#999}
+.device-all{margin-left:auto;font-size:11px;color:#999;cursor:pointer}
+.device-all:hover{color:var(--accent)}
 
-/* Layout helpers */
-.frames-row{display:flex;gap:24px;align-items:flex-start;margin:24px 0;flex-wrap:wrap}
-.annotation{font-size:13px;color:#666;text-align:center;margin-top:8px}
-.callout{background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;color:#ccc}
-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
-th,td{padding:10px 14px;border:1px solid #333;text-align:left}
-th{background:#2a2a2a;font-weight:600}
-td{color:#ccc}
+/* Session Row */
+.session-row{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;cursor:pointer}
+.session-row:hover{background:#f8f8f8}
+.session-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.session-avatar svg{width:16px;height:16px;fill:#fff}
+.session-info{flex:1;min-width:0}
+.session-info .title{font-size:13px;font-weight:500;color:#1a1d26;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-info .summary{font-size:11px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+
+/* === Phone Frame === */
+.phone{width:260px;height:564px;background:#F3F3F3;border-radius:36px;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.3);flex-shrink:0}
+.phone-bar{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:9px;color:#000;background:#F2F2F2}
+.phone-nav{height:34px;display:flex;align-items:center;padding:0 12px;font-size:13px;font-weight:500;color:#000;background:#F2F2F2}
+.phone-body{padding:10px 12px;overflow-y:auto;height:calc(100% - 62px - 56px)}
+.phone-tab{position:absolute;bottom:0;left:0;right:0;height:56px;background:#F3F3F3;display:flex;align-items:center;justify-content:space-around;border-top:1px solid #e5e5e5;font-size:10px;color:#999}
+.phone-tab .active{color:var(--accent);font-weight:600}
+.phone-home{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:72px;height:3px;background:#000;border-radius:2px}
+
+/* Helpers */
+.frames-row{display:flex;gap:20px;align-items:flex-start;margin:20px 0;flex-wrap:wrap}
+.frame-label{font-size:11px;color:#666;text-align:center;margin-top:6px}
+.file-card{background:#fff;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin:6px 0}
+.file-icon{width:24px;height:24px;border-radius:5px;background:#E8F0FE;display:flex;align-items:center;justify-content:center;font-size:12px}
+.file-name{font-size:11px;font-weight:500;color:#1a1d26}
+.file-meta{font-size:9px;color:#999}
+.file-dl{width:16px;height:16px;border-radius:50%;border:1.2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--accent);margin-left:auto}
 </style>
 </head>
 <body>
 <div class="container">
 
-<span class="section-label">PRD 网页版</span>
-<h1>多设备 Session 与跨端生成物消费</h1>
-<p>本文档按页面维度组织，每个页面配有高保真 UI 还原 + 交互规则说明。</p>
+<span class="label">PRD 网页版 · 基于设计稿还原</span>
+<h1>多设备 Session 同步</h1>
+<p class="desc">按页面维度组织，每页配 UI 还原 + 交互规则。page 6.3</p>
 
-<!-- ============ Section: PC 设备工作台 ============ -->
-<h2>一、PC 端 — 设备工作台</h2>
-<p>左侧导航新增"设备工作台"入口，中间展示设备列表，右侧展示 session 详情。</p>
+<!-- ===================== PC: 我的设备 ===================== -->
+<h2>一、PC 端 — 我的设备</h2>
 
-<h3>1.1 设备列表态</h3>
-<div class="pc-frame">
-  <div class="pc-sidebar">
-    <div class="nav-item">＋ 新建对话</div>
-    <div class="nav-item">⏱ 任务</div>
-    <div class="nav-item active">📱 设备工作台</div>
-    <div class="nav-item">📁 资料</div>
-    <div class="nav-item">⚙ 设置</div>
-    <div style="margin-top:24px;font-size:11px;color:#999;padding:0 12px">对话记录</div>
-    <div style="font-size:12px;color:#666;padding:6px 12px;border-radius:8px;margin-top:4px">手机板书照片整理笔记</div>
-    <div style="font-size:12px;color:#666;padding:6px 12px;border-radius:8px">季度PPT生成</div>
+<h3>1.1 设备工作台（设备分组 + session 列表）</h3>
+<div class="mac-win">
+<div class="mac-titlebar"><div class="mac-dot r"></div><div class="mac-dot y"></div><div class="mac-dot g"></div><span style="flex:1"></span><span style="font-size:11px;color:#999">发送文档</span></div>
+<div class="mac-body">
+<div class="sidebar">
+  <div class="sb-item"><span class="icon">＋</span>新建对话</div>
+  <div class="sb-item"><span class="icon">⏱</span>任务</div>
+  <div class="sb-item active"><span class="icon">📱</span>我的设备</div>
+  <div class="sb-item"><span class="icon">📁</span>资料</div>
+  <div class="sb-item"><span class="icon">⚙</span>设置</div>
+  <div class="sb-sep">对话记录</div>
+  <div class="sb-hist">帮我找昨天使用的所有工作…</div>
+  <div class="sb-hist">北京下周会下雨吗？</div>
+  <div class="sb-hist">帮我创建一个自动化</div>
+</div>
+<div class="content">
+  <div class="content-title"><span>设备工作台</span><div class="add-btn">＋</div></div>
+  
+  <!-- Device Group 1 -->
+  <div class="device-group">
+    <div class="device-header">
+      <div class="device-icon">📱</div>
+      <span class="device-name">Xiaomi 17Pro</span>
+      <span class="device-status">• 在线</span>
+      <span class="device-all">全部历史对话 ›</span>
+    </div>
+    <div class="session-row">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">小米股票分析简报生成</div><div class="summary">最近一周小米股票呈现稳定状态</div></div>
+    </div>
+    <div class="session-row" style="background:#f8f8f8;border:1.5px solid #FF0000;border-radius:10px">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">板书总结成课堂笔记</div><div class="summary">整理完毕，请查看。</div></div>
+    </div>
+    <div class="session-row">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">解密游戏推荐咨询</div><div class="summary">这次我们来深入聊聊"逻辑解谜类"游戏。这类摒弃瞬时操作，不靠反应速度取胜，以线索梳理、规律推演、因果求证为…</div></div>
+    </div>
+    <div class="session-row">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">解密游戏推荐咨询</div><div class="summary">这次我们来深入聊聊"逻辑解谜类"游戏。这类摒弃瞬时操作，不靠反应速度取胜，以线索梳理、规律推演、因果求证为…</div></div>
+    </div>
+    <div class="session-row">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">解密游戏推荐咨询</div><div class="summary">这次我们来深入聊聊"逻辑解谜类"游戏。这类摒弃瞬时操作，不靠反应速度取胜，以线索梳理、规律推演、因果求证为…</div></div>
+    </div>
+    <div class="session-row">
+      <div class="session-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+      <div class="session-info"><div class="title">蒙脱石散止泻作用</div><div class="summary">天然蒙脱石为层纹状微粒结构，可在肠道内吸附轮状病毒、诸如病毒、致病菌、肠道毒素，吸附后随粪便排出体外、消…</div></div>
+    </div>
   </div>
-  <div class="pc-content">
-    <div class="pc-title">设备工作台</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px">
-      <div class="device-card">
-        <div class="device-avatar">📱</div>
-        <div class="device-info"><h4>Xiaomi 17 Pro</h4><p>最近：帮我整理课堂笔记</p></div>
-        <div class="status-dot"></div>
-      </div>
-      <div class="device-card">
-        <div class="device-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">📟</div>
-        <div class="device-info"><h4>Xiaomi Pad 7 Pro</h4><p>最近：阅读论文标注</p></div>
-        <div class="status-dot" style="background:#999"></div>
-      </div>
+  
+  <!-- Device Group 2 -->
+  <div class="device-group">
+    <div class="device-header">
+      <div class="device-icon" style="background:#E8E0F8">📟</div>
+      <span class="device-name">XiaomiPad 7</span>
+      <span class="device-status">• 在线</span>
+      <span class="device-all">全部历史对话 ›</span>
     </div>
   </div>
 </div>
+</div>
+</div>
 
 <div class="callout">
-  <strong>交互规则：</strong><br>
-  • 点击设备卡片 → 右侧展开该设备历史 session 列表<br>
-  • 设备卡片右上角"更多"→ 近手菜单（新建对话 / 查看文件）<br>
-  • 在线设备绿色状态点，离线设备灰色
+<strong>交互规则：</strong><br>
+• 侧边栏 Tab 名称：<strong>我的设备</strong><br>
+• 内容区大标题：设备工作台<br>
+• 每个设备一个分组，展示设备图标 + 名称 + 在线/离线状态 + "全部历史对话 ›"<br>
+• 分组下展开该设备最近的 session 列表（标题+摘要）<br>
+• 点击 session → 右侧切为跨端 session 对话详情<br>
+• 右上角"＋"：对选中设备新建对话
 </div>
 
 <h3>1.2 跨端 Session 对话详情</h3>
-<div class="pc-frame">
-  <div class="pc-sidebar">
-    <div class="nav-item">＋ 新建对话</div>
-    <div class="nav-item">⏱ 任务</div>
-    <div class="nav-item active">📱 设备工作台</div>
-    <div class="nav-item">📁 资料</div>
-    <div class="nav-item">⚙ 设置</div>
+<div class="mac-win">
+<div class="mac-titlebar"><div class="mac-dot r"></div><div class="mac-dot y"></div><div class="mac-dot g"></div></div>
+<div class="mac-body">
+<div class="sidebar">
+  <div class="sb-item"><span class="icon">＋</span>新建对话</div>
+  <div class="sb-item"><span class="icon">⏱</span>任务</div>
+  <div class="sb-item active"><span class="icon">📱</span>我的设备</div>
+  <div class="sb-item"><span class="icon">📁</span>资料</div>
+  <div class="sb-item"><span class="icon">⚙</span>设置</div>
+</div>
+<div class="content">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+    <div style="width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:12px">📱</div>
+    <div style="font-size:15px;font-weight:500;color:#000">帮我找昨天使用的所有工作文件</div>
   </div>
-  <div class="pc-content">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#10b981);display:flex;align-items:center;justify-content:center;font-size:12px">📱</div>
-      <div class="pc-title" style="margin:0">帮我整理课堂笔记</div>
+  <div style="font-size:11px;color:#757575;margin-bottom:16px">Xiaomi 17Pro 的对话</div>
+  
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:560px">
+    <div style="align-self:flex-start;background:#fff;padding:10px 14px;border-radius:12px;font-size:12px;color:#333;max-width:420px;line-height:1.6">
+      好的，我来帮你找一下。我在手机本地存储中检索了昨天创建或修改的文件...
     </div>
-    <div class="pc-subtitle" style="margin-bottom:16px">Xiaomi 17Pro 的对话</div>
-    <!-- Chat bubbles -->
-    <div style="display:flex;flex-direction:column;gap:12px;max-width:600px">
-      <div style="align-self:flex-end;background:#D1E3FF;padding:10px 14px;border-radius:14px 14px 4px 14px;font-size:13px;color:#1a1d26;max-width:400px">帮我把下午拍的板书整理成课件PPT</div>
-      <div style="background:#fff;padding:10px 14px;border-radius:14px 14px 14px 4px;font-size:13px;color:#1a1d26;max-width:450px">好的，我正在从手机相册获取今天下午的板书照片，共找到4张。正在识别内容并生成PPT...</div>
-      <div class="file-card" style="max-width:300px">
-        <div class="file-icon">📊</div>
-        <div class="file-info">
-          <div class="name">课堂笔记-有机化学.pptx</div>
-          <div class="meta">2.3MB · 在手机上 · AI生成</div>
-        </div>
-        <div class="file-download">↓</div>
-      </div>
-    </div>
-    <!-- Input bar -->
-    <div style="position:absolute;bottom:16px;left:240px;right:16px;height:44px;background:#fff;border-radius:22px;border:1.5px solid rgba(59,130,246,0.3);display:flex;align-items:center;padding:0 16px">
-      <span style="font-size:13px;color:#999">追加指令...</span>
-      <div style="margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center">
-        <span style="color:#fff;font-size:12px">↑</span>
-      </div>
+    <div class="file-card" style="max-width:280px">
+      <div class="file-icon">📄</div>
+      <div style="flex:1"><div class="file-name">工作周报-0604.docx</div><div class="file-meta">1.2MB · 在手机上</div></div>
+      <div class="file-dl">↓</div>
     </div>
   </div>
+  
+  <div style="position:absolute;bottom:16px;left:212px;right:16px;height:40px;background:#fff;border-radius:20px;border:1.5px solid rgba(59,130,246,0.3);display:flex;align-items:center;padding:0 14px">
+    <span style="font-size:12px;color:#999">输入追加指令...</span>
+    <div style="margin-left:auto;width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center"><span style="color:#fff;font-size:11px">↑</span></div>
+  </div>
+</div>
+</div>
 </div>
 
 <div class="callout">
-  <strong>交互规则：</strong><br>
-  • 顶部标题栏：设备头像 + session标题 + "Xiaomi 17Pro 的对话"<br>
-  • 跨端文件卡片：文件名+大小+"在[设备名]上"+下载按钮<br>
-  • 底部输入框可追加指令，通过 A2A 发送到归属设备执行<br>
-  • 右上角"更多"菜单：删除 session
+<strong>交互规则：</strong><br>
+• 顶部：设备头像 + session 标题 + "Xiaomi 17Pro 的对话"副标题<br>
+• 对话流：AI 回复（白色气泡）+ 跨端文件卡片<br>
+• 跨端文件卡片：文件名 + 大小 + "在[设备名]上" + 下载按钮<br>
+• 底部输入框：可追加指令（A2A 发送到归属设备执行）<br>
+• 下载后文件卡片变为"已下载"态（无下载按钮）
 </div>
 
-<!-- ============ Section: 手机端 ============ -->
+<!-- ===================== 手机端 ===================== -->
 <h2>二、手机端 — 设备列表与跨端 Session</h2>
 
-<h3>2.1 页面层级</h3>
+<h3>2.1 关键页面</h3>
 <div class="frames-row">
-  <!-- Phone: Device List -->
-  <div>
-    <div class="phone-frame">
-      <div class="phone-status"><span>10:36</span><span>📶 🔋</span></div>
-      <div class="phone-nav">设备</div>
-      <div class="phone-content">
-        <div class="device-card">
-          <div class="device-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:14px">💻</div>
-          <div class="device-info"><h4>MacBook Pro</h4><p>最近：Q2营销方案PPT</p></div>
-          <div class="status-dot"></div>
-        </div>
-        <div class="device-card">
-          <div class="device-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316);font-size:14px">📟</div>
-          <div class="device-info"><h4>Xiaomi Pad 7</h4><p>最近：有机化学笔记整理</p></div>
-          <div class="status-dot" style="background:#999"></div>
-        </div>
-      </div>
-      <div class="phone-bottom">
-        <span style="font-size:11px;color:#999">对话</span>
-        <span style="font-size:11px;color:var(--accent);font-weight:600">设备</span>
-        <span style="font-size:11px;color:#999">发现</span>
-      </div>
-      <div class="phone-home-bar"></div>
-    </div>
-    <div class="annotation">设备列表页</div>
-  </div>
 
-  <!-- Phone: Session List -->
-  <div>
-    <div class="phone-frame">
-      <div class="phone-status"><span>10:36</span><span>📶 🔋</span></div>
-      <div class="phone-nav" style="justify-content:space-between"><span>← MacBook Pro</span><span style="font-size:12px;color:#999">在线</span></div>
-      <div class="phone-content">
-        <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px">
-          <div style="font-size:13px;font-weight:500;color:#1a1d26">Q2营销方案PPT</div>
-          <div style="font-size:11px;color:#999;margin-top:2px">已完成 ✓ · 今天 14:30</div>
-        </div>
-        <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px">
-          <div style="font-size:13px;font-weight:500;color:#1a1d26">分析销售数据</div>
-          <div style="font-size:11px;color:#22c55e;margin-top:2px">进行中 🟢 · 今天 15:02</div>
-        </div>
-        <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:8px">
-          <div style="font-size:13px;font-weight:500;color:#1a1d26">小米AI竞品研究报告</div>
-          <div style="font-size:11px;color:#999;margin-top:2px">已完成 ✓ · 昨天 09:15</div>
-        </div>
-      </div>
-      <div class="phone-home-bar"></div>
+<!-- Phone: 设备 session 列表 -->
+<div>
+<div class="phone">
+  <div class="phone-bar"><span>10:36</span><span style="font-size:8px">●●● 🔋</span></div>
+  <div class="phone-nav">← Xiaomi 17Pro 的对话</div>
+  <div class="phone-body">
+    <div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:500;color:#1a1d26">小米股票分析简报</div>
+      <div style="font-size:10px;color:#999;margin-top:2px">已完成 ✓</div>
     </div>
-    <div class="annotation">设备 Session 列表</div>
+    <div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:500;color:#1a1d26">板书总结成课堂笔记</div>
+      <div style="font-size:10px;color:#22c55e;margin-top:2px">进行中 🟢</div>
+    </div>
+    <div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:500;color:#1a1d26">解密游戏推荐</div>
+      <div style="font-size:10px;color:#999;margin-top:2px">已完成 ✓</div>
+    </div>
   </div>
+  <div class="phone-tab"><span>对话</span><span class="active">设备</span><span>发现</span></div>
+  <div class="phone-home"></div>
+</div>
+<div class="frame-label">设备 Session 列表</div>
+</div>
 
-  <!-- Phone: Session Detail -->
-  <div>
-    <div class="phone-frame">
-      <div class="phone-status"><span>10:36</span><span>📶 🔋</span></div>
-      <div class="phone-nav"><span>← Q2营销方案PPT</span></div>
-      <div class="phone-content" style="display:flex;flex-direction:column;gap:8px">
-        <div style="align-self:flex-end;background:#D1E3FF;padding:8px 12px;border-radius:12px 12px 4px 12px;font-size:12px;color:#1a1d26;max-width:200px">帮我做一份Q2营销方案PPT</div>
-        <div style="background:#fff;padding:8px 12px;border-radius:12px 12px 12px 4px;font-size:12px;color:#1a1d26;max-width:220px">好的，正在生成PPT...</div>
-        <div class="file-card" style="max-width:240px">
-          <div class="file-icon">📊</div>
-          <div class="file-info">
-            <div class="name">Q2营销方案.pptx</div>
-            <div class="meta">5.1MB · 在 PC 上</div>
-          </div>
-          <div class="file-download">↓</div>
-        </div>
-      </div>
-      <div style="position:absolute;bottom:14px;left:14px;right:14px;height:36px;background:#fff;border-radius:18px;border:1px solid #ddd;display:flex;align-items:center;padding:0 12px;font-size:11px;color:#999">追加指令...</div>
-      <div class="phone-home-bar"></div>
+<!-- Phone: Session 详情 -->
+<div>
+<div class="phone">
+  <div class="phone-bar"><span>10:36</span><span style="font-size:8px">●●● 🔋</span></div>
+  <div class="phone-nav">← 板书总结成课堂笔记</div>
+  <div class="phone-body" style="display:flex;flex-direction:column;gap:6px">
+    <div style="align-self:flex-end;background:#D1E3FF;padding:7px 10px;border-radius:10px 10px 3px 10px;font-size:11px;color:#1a1d26;max-width:170px">把下午拍的板书整理成课件PPT</div>
+    <div style="background:#fff;padding:7px 10px;border-radius:10px 10px 10px 3px;font-size:11px;color:#333;max-width:190px">正在识别板书内容并生成PPT...</div>
+    <div class="file-card" style="max-width:200px">
+      <div class="file-icon">📊</div>
+      <div style="flex:1"><div class="file-name">课堂笔记.pptx</div><div class="file-meta">2.3MB · 在PC上</div></div>
+      <div class="file-dl">↓</div>
     </div>
-    <div class="annotation">跨端 Session 详情</div>
+    <div style="align-self:flex-end;background:#D1E3FF;padding:7px 10px;border-radius:10px 10px 3px 10px;font-size:11px;color:#1a1d26;max-width:170px">帮我把第三页标题改一下</div>
   </div>
+  <div style="position:absolute;bottom:56px;left:10px;right:10px;height:32px;background:#fff;border-radius:16px;border:1px solid #ddd;display:flex;align-items:center;padding:0 10px;font-size:10px;color:#999">追加指令...</div>
+  <div class="phone-tab"><span>对话</span><span class="active">设备</span><span>发现</span></div>
+  <div class="phone-home"></div>
+</div>
+<div class="frame-label">跨端 Session 详情</div>
+</div>
+
+<!-- Phone: 文件预览 -->
+<div>
+<div class="phone" style="background:#fff">
+  <div class="phone-bar" style="background:#fff"><span>10:36</span><span style="font-size:8px">●●● 🔋</span></div>
+  <div class="phone-nav" style="background:#fff;border-bottom:1px solid #eee">← 课堂笔记.pptx</div>
+  <div class="phone-body" style="display:flex;align-items:center;justify-content:center">
+    <div style="width:180px;height:120px;background:#f0f4ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px">📊</div>
+  </div>
+  <div style="position:absolute;bottom:56px;left:0;right:0;display:flex;justify-content:center;gap:12px;padding:8px">
+    <div style="padding:6px 16px;background:var(--accent);color:#fff;border-radius:16px;font-size:11px">保存到笔记</div>
+    <div style="padding:6px 16px;background:#f0f0f0;color:#333;border-radius:16px;font-size:11px">分享</div>
+  </div>
+  <div class="phone-home"></div>
+</div>
+<div class="frame-label">文件预览 + 操作</div>
+</div>
+
 </div>
 
 <div class="callout">
-  <strong>交互规则：</strong><br>
-  • 设备列表页 → 点击设备 → 该设备的 session 列表<br>
-  • Session 列表：按时间倒序，展示标题+状态（进行中🟢/已完成✓）<br>
-  • 点击 session → 全屏对话详情（含跨端文件卡+追加指令输入框）<br>
-  • 长按 session → 删除（二次确认弹窗，删除同步所有端）
+<strong>交互规则：</strong><br>
+• 设备列表 → 点设备 → 该设备 session 列表<br>
+• session 列表：按时间倒序，标题 + 状态（进行中🟢 / 已完成✓）<br>
+• 点 session → 全屏对话详情（含文件卡 + 追加指令框）<br>
+• 点文件卡 → 二级预览页（图片全屏/文档渲染/WebView）<br>
+• 底部操作按钮按文件类型：图片视频→保存相册 / PPT文档→保存笔记 / HTML→保存Download<br>
+• 长按 session → 删除（二次确认弹窗，删除同步所有端）
 </div>
 
-<!-- ============ Section: 结果卡与文件消费 ============ -->
-<h2>三、跨端文件卡片与结果消费</h2>
+<!-- ===================== 文件卡与同步 ===================== -->
+<h2>三、跨端文件卡片规范</h2>
 
-<h3>3.1 文件卡片样式</h3>
-<div class="frames-row">
-  <div style="background:#fff;border-radius:16px;padding:16px;width:320px">
-    <div style="font-size:11px;color:#999;margin-bottom:8px">本端文件</div>
-    <div class="file-card" style="border:1px solid #e5e5e5">
-      <div class="file-icon">📊</div>
-      <div class="file-info"><div class="name">Q2营销方案.pptx</div><div class="meta">5.1MB · AI生成</div></div>
-    </div>
-    <div style="font-size:11px;color:#999;margin:12px 0 8px">对端文件（未下载）</div>
-    <div class="file-card" style="border:1px solid #e5e5e5">
-      <div class="file-icon" style="background:#FEF3C7">📄</div>
-      <div class="file-info"><div class="name">技术方案.docx</div><div class="meta">2.3MB · 在 PC 上</div></div>
-      <div class="file-download">↓</div>
-    </div>
-    <div style="font-size:11px;color:#999;margin:12px 0 8px">对端文件（已下载）</div>
-    <div class="file-card" style="border:1px solid #e5e5e5">
-      <div class="file-icon" style="background:#DCFCE7">🎬</div>
-      <div class="file-info"><div class="name">旅行Vlog.mp4</div><div class="meta">15.2MB · 已下载</div></div>
-    </div>
+<h3>3.1 三种状态</h3>
+<div style="background:#fff;border-radius:12px;padding:16px;max-width:320px;margin:16px 0">
+  <div style="font-size:10px;color:#999;margin-bottom:6px">对端文件（未下载）</div>
+  <div class="file-card" style="border:1px solid #eee">
+    <div class="file-icon">📊</div>
+    <div style="flex:1"><div class="file-name">Q2营销方案.pptx</div><div class="file-meta">5.1MB · 在 PC 上</div></div>
+    <div class="file-dl">↓</div>
+  </div>
+  <div style="font-size:10px;color:#999;margin:10px 0 6px">对端文件（已下载）</div>
+  <div class="file-card" style="border:1px solid #eee">
+    <div class="file-icon" style="background:#DCFCE7">📄</div>
+    <div style="flex:1"><div class="file-name">技术方案.docx</div><div class="file-meta">2.3MB · 已下载</div></div>
+  </div>
+  <div style="font-size:10px;color:#999;margin:10px 0 6px">本端文件</div>
+  <div class="file-card" style="border:1px solid #eee">
+    <div class="file-icon" style="background:#FEF3C7">🎬</div>
+    <div style="flex:1"><div class="file-name">旅行Vlog.mp4</div><div class="file-meta">15.2MB · AI生成</div></div>
   </div>
 </div>
 
-<h3>3.2 文件操作按钮规范</h3>
+<h3>3.2 操作按钮规范</h3>
 <table>
-  <tr><th>文件类型</th><th>预览方式</th><th>主操作</th><th>次操作</th></tr>
-  <tr><td>图片/视频</td><td>全屏查看</td><td>保存到相册</td><td>分享</td></tr>
-  <tr><td>PPT/Doc/Excel</td><td>文档预览</td><td>保存到笔记</td><td>分享</td></tr>
-  <tr><td>HTML</td><td>WebView</td><td>保存到Download</td><td>分享</td></tr>
-  <tr><td>PDF</td><td>文档预览</td><td>保存到笔记</td><td>分享</td></tr>
+<tr><th>文件类型</th><th>预览方式</th><th>主操作</th><th>次操作</th></tr>
+<tr><td>图片/视频</td><td>全屏查看</td><td>保存到相册</td><td>分享</td></tr>
+<tr><td>PPT/Doc/Excel</td><td>文档预览</td><td>保存到笔记</td><td>分享</td></tr>
+<tr><td>HTML</td><td>WebView</td><td>保存到Download</td><td>分享</td></tr>
+<tr><td>PDF</td><td>文档预览</td><td>保存到笔记</td><td>分享</td></tr>
 </table>
 
-<!-- ============ Section: 同步与远程指令 ============ -->
+<!-- ===================== 同步与指令 ===================== -->
 <h2>四、数据同步与远程指令</h2>
 
 <h3>4.1 同步规则</h3>
 <table>
-  <tr><th>内容类型</th><th>是否同步</th><th>说明</th></tr>
-  <tr><td>用户 Query</td><td>✅ 必须同步</td><td>纯文本/图片各端能展示</td></tr>
-  <tr><td>AI 文本回复</td><td>✅ 必须同步</td><td>Markdown 各端能渲染</td></tr>
-  <tr><td>文件产物</td><td>⚠️ 元信息同步</td><td>文件实体留本地，对端显示卡片+"传到本机"</td></tr>
-  <tr><td>思考过程</td><td>❌ 不同步</td><td>"思考完成"折叠块</td></tr>
-  <tr><td>任务状态</td><td>✅ 实时同步</td><td>进行中/已完成/失败</td></tr>
+<tr><th>内容类型</th><th>同步</th><th>说明</th></tr>
+<tr><td>用户 Query</td><td>✅ 必须</td><td>纯文本/图片各端展示</td></tr>
+<tr><td>AI 文本回复</td><td>✅ 必须</td><td>Markdown 各端渲染</td></tr>
+<tr><td>文件产物</td><td>⚠️ 元信息</td><td>文件实体留本地，对端显示卡片+"传到本机"</td></tr>
+<tr><td>思考过程</td><td>❌</td><td>"思考完成"折叠块</td></tr>
+<tr><td>任务状态</td><td>✅ 实时</td><td>进行中/已完成/失败</td></tr>
 </table>
 
 <h3>4.2 远程指令状态机</h3>
-<div style="background:#2a2a2a;border-radius:12px;padding:20px;font-family:monospace;font-size:13px;color:#ccc;margin:16px 0;line-height:2">
-  PENDING → DELIVERED → EXECUTING → SUCCESS / FAILED<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘ TIMEOUT（TTL 7天）<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘ CANCELLED
+<div style="background:#222;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;color:#ccc;margin:12px 0;line-height:2.2">
+PENDING → DELIVERED → EXECUTING → SUCCESS / FAILED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘ TIMEOUT（7天）<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘ CANCELLED
 </div>
 
 <h3>4.3 异常处理</h3>
 <table>
-  <tr><th>场景</th><th>处理</th><th>用户感知</th></tr>
-  <tr><td>B 端离线</td><td>入云端队列 TTL=7天</td><td>"PC 离线，上线后自动执行"</td></tr>
-  <tr><td>B 端上线</td><td>自动取出执行</td><td>推送"PC 已开始执行"</td></tr>
-  <tr><td>执行中网络断</td><td>B 端本地继续</td><td>A 端"等待结果回传…"</td></tr>
-  <tr><td>并发冲突</td><td>FIFO 排队</td><td>"排队中（前面 1 个）"</td></tr>
-  <tr><td>Agent 崩溃</td><td>30s 无心跳→FAILED</td><td>"执行异常，请在 PC 检查"</td></tr>
+<tr><th>场景</th><th>处理</th><th>用户感知</th></tr>
+<tr><td>B 端离线</td><td>入队列 TTL=7天</td><td>"PC 离线，上线后自动执行"</td></tr>
+<tr><td>B 端上线</td><td>自动执行</td><td>推送"PC 已开始执行"</td></tr>
+<tr><td>并发冲突</td><td>FIFO 排队</td><td>"排队中（前面 1 个）"</td></tr>
+<tr><td>Agent 崩溃</td><td>30s→FAILED</td><td>"执行异常，请在 PC 检查"</td></tr>
+<tr><td>用户取消</td><td>cancel 信号</td><td>"已取消"+部分结果保留</td></tr>
 </table>
 
-<!-- ============ Section: 通知 ============ -->
-<h2>五、超级岛与跨端通知</h2>
+<!-- ===================== 通知 ===================== -->
+<h2>五、通知与授权</h2>
 <div class="callout">
-  • 任务执行中 → 超级岛进度气泡<br>
-  • 任务完成 → 系统通知，点击跳到 session 详情（不跳笔记）<br>
-  • <strong>跨端联动</strong>：手机发起任务 + 用户正在用 PC → PC 端也弹完成通知<br>
-  • 首次远程指令 → 系统授权弹窗，之后同账号互信
+• 任务执行中 → 超级岛进度气泡<br>
+• 完成 → 系统通知，点击跳 session 详情（不跳笔记）<br>
+• <strong>跨端联动</strong>：手机发起 + 用户正在用 PC → PC 也弹完成通知<br>
+• 首次远程指令 → 系统授权弹窗，之后同账号互信<br>
+• 无多台设备 → 空态引导（引导登录同账号）<br>
+• 删除操作同步所有端，文件保留在资料库
 </div>
 
 </div>
