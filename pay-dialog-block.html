@@ -1,74 +1,132 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>积分耗尽 — 对话拦截 Card</title>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>积分耗尽 — 对话拦截 Card</title>
 <style>
-:root{--miclaw-color-text:#1c1f28;--miclaw-color-text-muted:#636878;--miclaw-color-accent:#3482ff}
+:root{--bg:#f6f7fa;--surface:#fff;--text:#1c1f28;--text-muted:#636878;--border:#e9ebf0;--accent:#3482ff;--accent-hover:#2b6fe0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'MiSans',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;font-weight:330;line-height:1.6;color:var(--miclaw-color-text);background:#fff;-webkit-font-smoothing:antialiased;padding:24px 0}
-.xu-flow{max-width:824px;width:100%;padding:0 12px;margin:0 auto;font-size:16px}
-.xu-flow-item{margin-top:13px}
+body{font-family:'MiSans',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;font-weight:330;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column}
+.shell{display:flex;flex:1;overflow:hidden;border-radius:8px;margin:8px;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.sidebar{width:240px;background:#fff;border-right:1px solid var(--border);padding:56px 16px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.sidebar-item{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:10px;font-size:14px;color:#202733;cursor:pointer}
+.sidebar-item:hover{background:#f2f7ff}
+.sidebar-item.active{background:#e8f2ff;color:var(--accent)}
+.sidebar-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.titlebar{height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:520;-webkit-app-region:drag}
+.chat-area{flex:1;overflow-y:auto;padding:24px 0}
+.xu-flow{max-width:824px;width:100%;padding:0 24px;margin:0 auto;font-size:16px}
+.xu-flow-item{margin-top:16px}
 .xu-user{display:flex;justify-content:flex-end}
-.xu-user-content{max-width:min(720px,86%);padding:10px 15px;line-height:1.5;border-radius:10px;background:rgba(52,130,255,0.1);color:#000;word-break:break-word}
-.quota-card{width:100%;max-width:540px;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)}
+.xu-user-content{max-width:min(600px,80%);padding:10px 15px;border-radius:10px;background:rgba(52,130,255,0.1);color:#000;line-height:1.5}
+.quota-card{width:100%;max-width:520px;border-radius:16px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)}
 .quota-card-body{padding:20px 24px 16px}
 .quota-card-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
-.quota-card-title{font-size:15px;font-weight:520;color:var(--miclaw-color-text);margin-bottom:6px}
-.quota-card-desc{font-size:13px;color:var(--miclaw-color-text-muted);line-height:1.6}
-.quota-card-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;height:54px;padding:0 16px;border-top:1px solid rgba(0,0,0,0.06);background:#fafafa}
-.btn-primary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:#fff;background:#3482ff;border:none;cursor:pointer}
-.btn-primary:hover{background:#2b6fe0}
-.btn-secondary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:rgba(0,0,0,0.8);background:#fff;border:1px solid rgba(0,0,0,0.1);cursor:pointer}
-.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:500}
-.tag-free{background:rgba(0,0,0,0.04);color:var(--miclaw-color-text-muted)}
-.tag-standard{background:rgba(52,130,255,0.1);color:#3482ff}
-.label{text-align:center;padding:16px 0 8px;font-size:12px;color:rgba(0,0,0,0.35);border-top:1px solid rgba(0,0,0,0.04);margin-top:24px}
-</style>
-</head>
-<body>
-<div class="xu-flow">
-  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一份周报，总结本周的工作成果</div></div></div>
-  <div class="xu-flow-item">
-    <div class="quota-card">
-      <div class="quota-card-body">
-        <div class="quota-card-icon">⚡</div>
-        <div class="quota-card-title">积分已用完</div>
-        <div class="quota-card-desc">本月免费积分已耗尽，升级标准会员获取 5 倍积分额度、高峰不降速、更多记忆容量。</div>
-        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="tag tag-free">当前：免费用户</span>
-          <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+.quota-card-title{font-size:15px;font-weight:520;margin-bottom:6px}
+.quota-card-desc{font-size:13px;color:var(--text-muted);line-height:1.6}
+.quota-card-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;height:50px;padding:0 16px;border-top:1px solid rgba(0,0,0,0.06);background:#fafafa}
+.btn-primary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:#fff;background:var(--accent);border:none;cursor:pointer}
+.btn-primary:hover{background:var(--accent-hover)}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.tag-free{background:rgba(0,0,0,0.04);color:var(--text-muted)}
+.tag-standard{background:rgba(52,130,255,0.1);color:var(--accent)}
+.tag-premium{background:linear-gradient(90deg,#fff7e1,#ffefc2);color:#92600a}
+.input-area{padding:12px 24px 16px;border-top:1px solid rgba(0,0,0,0.04)}
+.input-box{display:flex;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid #e0e5ec;background:#fff;font-size:14px;color:rgba(0,0,0,0.35)}
+.scene-label{text-align:center;padding:6px;font-size:11px;color:rgba(0,0,0,0.3);background:rgba(0,0,0,0.02)}
+.reset-info{font-size:12px;color:var(--text-muted);margin-top:10px;display:flex;align-items:center;gap:6px}
+</style></head><body>
+
+<!-- ===== 免费用户 ===== -->
+<div class="scene-label">场景 A：免费用户积分耗尽</div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-item active"><span class="sidebar-icon">💬</span>新对话</div>
+    <div class="sidebar-item"><span class="sidebar-icon">🔗</span>设备协作</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📁</span>资料</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📋</span>任务</div>
+  </aside>
+  <main class="main">
+    <div class="titlebar">超级小爱</div>
+    <div class="chat-area">
+      <div class="xu-flow">
+        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一份周报，总结本周的工作成果</div></div></div>
+        <div class="xu-flow-item">
+          <div class="quota-card">
+            <div class="quota-card-body">
+              <div class="quota-card-icon">⚡</div>
+              <div class="quota-card-title">积分已用完</div>
+              <div class="quota-card-desc">本月免费积分已耗尽。升级标准会员可获得 5 倍积分额度、高峰不降速、更多记忆容量。</div>
+              <div class="reset-info"><span class="tag tag-free">免费用户</span><span>· 下次重置：7月21日</span></div>
+            </div>
+            <div class="quota-card-footer">
+              <button class="btn-primary">升级标准会员 · ¥39/月</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="quota-card-footer">
-        <button class="btn-secondary">下月再说</button>
-        <button class="btn-primary">升级会员 · ¥39/月</button>
-      </div>
     </div>
-  </div>
+    <div class="input-area"><div class="input-box">输入消息...</div></div>
+  </main>
 </div>
-<div class="label">▲ 免费用户视角</div>
-<div class="xu-flow" style="margin-top:32px;">
-  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">深度分析一下这份竞品报告的核心论点</div></div></div>
-  <div class="xu-flow-item">
-    <div class="quota-card">
-      <div class="quota-card-body">
-        <div class="quota-card-icon">⚡</div>
-        <div class="quota-card-title">本月积分已用完</div>
-        <div class="quota-card-desc">标准会员积分额度已耗尽。升级高级会员可获得 10 倍积分额度和优先响应。</div>
-        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="tag tag-standard">当前：标准会员</span>
-          <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+
+<!-- ===== 标准会员 ===== -->
+<div class="scene-label" style="margin-top:4px">场景 B：标准会员积分耗尽</div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-item active"><span class="sidebar-icon">💬</span>新对话</div>
+    <div class="sidebar-item"><span class="sidebar-icon">🔗</span>设备协作</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📁</span>资料</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📋</span>任务</div>
+  </aside>
+  <main class="main">
+    <div class="titlebar">超级小爱</div>
+    <div class="chat-area">
+      <div class="xu-flow">
+        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">深度分析这份竞品报告的核心论点</div></div></div>
+        <div class="xu-flow-item">
+          <div class="quota-card">
+            <div class="quota-card-body">
+              <div class="quota-card-icon">⚡</div>
+              <div class="quota-card-title">本月积分已用完</div>
+              <div class="quota-card-desc">标准会员额度已耗尽。升级高级会员可获得 10 倍积分额度和优先响应速度。</div>
+              <div class="reset-info"><span class="tag tag-standard">标准会员</span><span>· 下次重置：7月21日</span></div>
+            </div>
+            <div class="quota-card-footer">
+              <button class="btn-primary">升级高级会员 · ¥199/月</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="quota-card-footer">
-        <button class="btn-secondary">等待重置</button>
-        <button class="btn-primary">升级高级会员 · ¥199/月</button>
+    </div>
+    <div class="input-area"><div class="input-box">输入消息...</div></div>
+  </main>
+</div>
+
+<!-- ===== 高级会员 ===== -->
+<div class="scene-label" style="margin-top:4px">场景 C：高级会员积分耗尽（已是最高等级）</div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-item active"><span class="sidebar-icon">💬</span>新对话</div>
+    <div class="sidebar-item"><span class="sidebar-icon">🔗</span>设备协作</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📁</span>资料</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📋</span>任务</div>
+  </aside>
+  <main class="main">
+    <div class="titlebar">超级小爱</div>
+    <div class="chat-area">
+      <div class="xu-flow">
+        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我生成一段产品宣传视频脚本</div></div></div>
+        <div class="xu-flow-item">
+          <div class="quota-card">
+            <div class="quota-card-body">
+              <div class="quota-card-icon">⚡</div>
+              <div class="quota-card-title">本月积分已用完</div>
+              <div class="quota-card-desc">高级会员额度已耗尽，积分将在下月自动重置。您已是最高等级会员。</div>
+              <div class="reset-info"><span class="tag tag-premium">高级会员</span><span>· 7月21日重置，届时恢复全部额度</span></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+    <div class="input-area"><div class="input-box">输入消息...</div></div>
+  </main>
 </div>
-<div class="label">▲ 标准会员视角</div>
-</body>
-</html>
+</body></html>

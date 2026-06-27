@@ -1,10 +1,21 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>模型切换面板 — 积分不足置灰</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"MiSans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-weight:330;background:#fff;padding:32px 40px;display:flex;gap:60px;flex-wrap:wrap}
-.panel{flex:0 0 auto}
-.panel-title{font-size:11px;color:rgba(0,0,0,0.4);margin-bottom:12px}
-.mode-selector-trigger{display:inline-flex;height:32px;align-items:center;gap:6px;border-radius:8px;border:1px solid #d8e7ff;background:#f5faff;padding:0 10px;font-size:12px;color:#3482ff;cursor:pointer}
-.mode-selector-menu{width:160px;border-radius:6px;border:1px solid #edf0f5;background:#fff;padding:8px 0;box-shadow:0 12px 30px rgba(31,35,41,0.14);margin-top:8px}
-.mode-option{display:flex;height:34px;width:100%;align-items:center;gap:8px;padding:0 12px;font-size:12px;color:#333b47;cursor:pointer;border:none;background:none;text-align:left}
+<style>
+:root{--bg:#f6f7fa;--surface:#fff;--text:#1c1f28;--text-muted:#636878;--border:#e9ebf0;--accent:#3482ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'MiSans',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;font-weight:330;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;height:100vh;display:flex}
+.shell{display:flex;flex:1;overflow:hidden;border-radius:8px;margin:8px;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.sidebar{width:240px;background:#fff;border-right:1px solid var(--border);padding:56px 16px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+.sidebar-item{display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:10px;font-size:14px;color:#202733}
+.sidebar-item.active{background:#e8f2ff;color:var(--accent)}
+.sidebar-icon{width:18px;height:18px;font-size:14px;display:flex;align-items:center;justify-content:center}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.titlebar{height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:520}
+.chat-area{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:15px}
+.input-area{padding:12px 24px 16px;border-top:1px solid rgba(0,0,0,0.04);position:relative}
+.input-box{display:flex;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid #e0e5ec;background:#fff;font-size:14px;color:rgba(0,0,0,0.35)}
+.mode-trigger{display:inline-flex;height:32px;align-items:center;gap:6px;border-radius:8px;border:1px solid #d8e7ff;background:#f5faff;padding:0 10px;font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:8px}
+.mode-menu{position:absolute;bottom:72px;left:24px;width:170px;border-radius:8px;border:1px solid #edf0f5;background:#fff;padding:8px 0;box-shadow:0 12px 30px rgba(31,35,41,0.14);z-index:10}
+.mode-option{display:flex;height:36px;width:100%;align-items:center;gap:8px;padding:0 12px;font-size:12px;color:#333b47;border:none;background:none;text-align:left;cursor:pointer}
 .mode-option:hover{background:#f7faff}
 .mode-option.disabled{opacity:0.4;cursor:not-allowed}
 .mode-option .check{color:#1f2329;font-size:11px;margin-left:auto}
@@ -12,28 +23,30 @@
 .mode-icon-fast{background:#e8f5e9;color:#2e7d32}
 .mode-icon-deep{background:#e3f2fd;color:#1565c0}
 .mode-icon-expert{background:#fce4ec;color:#c62828}
-.mode-upgrade-row{margin-top:4px;padding:8px 12px 4px;border-top:1px solid #edf0f5;font-size:11px;color:#3482ff;cursor:pointer}
-.mode-upgrade-row:hover{text-decoration:underline}
 .need-tag{font-size:10px;color:#d97706;margin-left:auto}
-</style>
-</head><body>
-<div class="panel">
-  <p class="panel-title">积分充足时</p>
-  <div class="mode-selector-trigger"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span style="font-size:10px">▾</span></div>
-  <div class="mode-selector-menu">
-    <button class="mode-option"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span class="check">✓</span></button>
-    <button class="mode-option"><span class="mode-icon mode-icon-deep">��</span><span>深度思考</span></button>
-    <button class="mode-option"><span class="mode-icon mode-icon-expert">🎯</span><span>专家模式</span></button>
-  </div>
-</div>
-<div class="panel">
-  <p class="panel-title">积分耗尽时</p>
-  <div class="mode-selector-trigger" style="opacity:0.6"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span style="font-size:10px">▾</span></div>
-  <div class="mode-selector-menu">
-    <button class="mode-option"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span class="check">✓</span></button>
-    <button class="mode-option disabled"><span class="mode-icon mode-icon-deep">🔍</span><span>深度思考</span><span class="need-tag">需积分</span></button>
-    <button class="mode-option disabled"><span class="mode-icon mode-icon-expert">🎯</span><span>专家模式</span><span class="need-tag">需积分</span></button>
-    <div class="mode-upgrade-row">升级会员 →</div>
-  </div>
+.upgrade-row{padding:8px 12px 4px;border-top:1px solid #edf0f5;font-size:11px;color:var(--accent);cursor:pointer}
+.scene-label{position:absolute;top:56px;right:16px;font-size:10px;color:rgba(0,0,0,0.25);background:rgba(0,0,0,0.03);padding:2px 8px;border-radius:4px}
+</style></head><body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-item active"><span class="sidebar-icon">💬</span>新对话</div>
+    <div class="sidebar-item"><span class="sidebar-icon">🔗</span>设备协作</div>
+    <div class="sidebar-item"><span class="sidebar-icon">📁</span>资料</div>
+  </aside>
+  <main class="main">
+    <div class="titlebar">超级小爱</div>
+    <div class="scene-label">积分耗尽时 — 专家模式/深度思考置灰</div>
+    <div class="chat-area">开始新的对话...</div>
+    <div class="input-area">
+      <div class="mode-trigger"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span style="font-size:10px">▾</span></div>
+      <div class="mode-menu">
+        <button class="mode-option"><span class="mode-icon mode-icon-fast">⚡</span><span>快速模式</span><span class="check">✓</span></button>
+        <button class="mode-option disabled"><span class="mode-icon mode-icon-deep">🔍</span><span>深度思考</span><span class="need-tag">需积分</span></button>
+        <button class="mode-option disabled"><span class="mode-icon mode-icon-expert">🎯</span><span>专家模式</span><span class="need-tag">需积分</span></button>
+        <div class="upgrade-row">升级会员解锁 →</div>
+      </div>
+      <div class="input-box">输入消息...</div>
+    </div>
+  </main>
 </div>
 </body></html>

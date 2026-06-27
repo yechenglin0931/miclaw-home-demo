@@ -1,30 +1,45 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>设置页 — 会员身份展示</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"MiSans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-weight:330;background:#f6f7fa;padding:32px;display:flex;justify-content:center}
-.card{max-width:560px;width:100%;background:#fff;border-radius:12px;border:1px solid #e9ebf0;overflow:hidden}
-.account-row{padding:16px 20px;display:flex;align-items:center;gap:14px}
-.avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;font-size:20px;color:#3482ff;flex-shrink:0}
+<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!<!2px<!<!<!<!<!<!<!<!<!{background:rgba(0,0,0,0.06);color:var(--accent)}
+.nav-item:hover{background:rgba(0,0,0,0.03)}
+.settings-content{flex:1;padding:56px 32px 32px;overflow-y:auto}
+.settings-title{font-size:20px;font-weight:520;margin-bottom:24px}
+.account-card{border-radius:16px;background:#fff;border:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);flex-shrink:0}
 .user-info{flex:1;min-width:0}
-.username{font-size:15px;font-weight:520;color:#1c1f28}
-.member-badge{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 8px;border-radius:4px;background:linear-gradient(90deg,#f0f7ff,#e8f2ff);font-size:11px;color:#3482ff;font-weight:500}
-.manage-btn{font-size:12px;color:#3482ff;cursor:pointer;font-weight:500;padding:6px 12px;border-radius:6px;border:1px solid rgba(52,130,255,0.2);background:none}
-.usage-wrap{padding:12px 20px 16px;border-top:1px solid #e9ebf0}
-.usage-label{display:flex;justify-content:space-between;font-size:12px;color:#636878;margin-bottom:6px}
+.username{font-size:16px;font-weight:520}
+.member-badge{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 10px;border-radius:6px;background:linear-gradient(90deg,#f0f7ff,#e8f2ff);font-size:12px;color:var(--accent);font-weight:500}
+.manage-btn{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500;padding:8px 14px;border-radius:8px;border:1px solid rgba(52,130,255,0.2);background:none}
+.usage-section{margin-top:16px;padding:16px 24px;background:#fff;border-radius:16px;border:1px solid var(--border)}
+.usage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.usage-label{font-size:13px;color:var(--text-muted)}
 .usage-bar{height:6px;border-radius:3px;background:#eef0ff;overflow:hidden}
 .usage-fill{height:100%;border-radius:3px;background:#ffbb0f;width:72%}
-</style>
-</head><body>
-<div class="card">
-  <div class="account-row">
-    <div class="avatar">👤</div>
-    <div class="user-info">
-      <div class="username">叶成林</div>
-      <div class="member-badge">⭐ 标准会员 · 有效期至 2026-07-21</div>
+</style></head><body>
+<div class="shell">
+  <nav class="settings-nav">
+    <button class="nav-item active">账号</button>
+    <button class="nav-item">通用</button>
+    <button class="nav-item">设备互联</button>
+    <button class="nav-item">云服务</button>
+    <button class="nav-item">超级小爱</button>
+    <button class="nav-item">帮助</button>
+  </nav>
+  <div class="settings-content">
+    <div class="settings-title">账号</div>
+    <div class="account-card">
+      <div class="avatar">👤</div>
+      <div class="user-info">
+        <div class="username">叶成林</div>
+        <div class="member-badge">⭐ 标准会员 · 有效期至 2026-07-21</div>
+      </div>
+      <button class="manage-btn">管理订阅</button>
     </div>
-    <button class="manage-btn">管理订阅</button>
-  </div>
-  <div class="usage-wrap">
-    <div class="usage-label"><span>本月用量</span><span>已使用 72% · 重置时间 2026-07-21</span></div>
-    <div class="usage-bar"><div class="usage-fill"></div></div>
+    <div class="usage-section">
+      <div class="usage-header">
+        <span class="usage-label">本月积分用量</span>
+        <span class="usage-label">已使用 72% · 重置 2026-07-21</span>
+      </div>
+      <div class="usage-bar"><div class="usage-fill"></div></div>
+    </div>
   </div>
 </div>
 </body></html>
