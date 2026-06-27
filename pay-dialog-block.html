@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>积分耗尽 — 对话拦截 Card</title>
+<style>
+:root{--miclaw-color-text:#1c1f28;--miclaw-color-text-muted:#636878;--miclaw-color-accent:#3482ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'MiSans',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;font-weight:330;line-height:1.6;color:var(--miclaw-color-text);background:#fff;-webkit-font-smoothing:antialiased;padding:24px 0}
+.xu-flow{max-width:824px;width:100%;padding:0 12px;margin:0 auto;font-size:16px}
+.xu-flow-item{margin-top:13px}
+.xu-user{display:flex;justify-content:flex-end}
+.xu-user-content{max-width:min(720px,86%);padding:10px 15px;line-height:1.5;border-radius:10px;background:rgba(52,130,255,0.1);color:#000;word-break:break-word}
+.quota-card{width:100%;max-width:540px;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)}
+.quota-card-body{padding:20px 24px 16px}
+.quota-card-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.quota-card-title{font-size:15px;font-weight:520;color:var(--miclaw-color-text);margin-bottom:6px}
+.quota-card-desc{font-size:13px;color:var(--miclaw-color-text-muted);line-height:1.6}
+.quota-card-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;height:54px;padding:0 16px;border-top:1px solid rgba(0,0,0,0.06);background:#fafafa}
+.btn-primary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:#fff;background:#3482ff;border:none;cursor:pointer}
+.btn-primary:hover{background:#2b6fe0}
+.btn-secondary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:rgba(0,0,0,0.8);background:#fff;border:1px solid rgba(0,0,0,0.1);cursor:pointer}
+.tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:500}
+.tag-free{background:rgba(0,0,0,0.04);color:var(--miclaw-color-text-muted)}
+.tag-standard{background:rgba(52,130,255,0.1);color:#3482ff}
+.label{text-align:center;padding:16px 0 8px;font-size:12px;color:rgba(0,0,0,0.35);border-top:1px solid rgba(0,0,0,0.04);margin-top:24px}
+</style>
+</head>
+<body>
+<div class="xu-flow">
+  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一份周报，总结本周的工作成果</div></div></div>
+  <div class="xu-flow-item">
+    <div class="quota-card">
+      <div class="quota-card-body">
+        <div class="quota-card-icon">⚡</div>
+        <div class="quota-card-title">积分已用完</div>
+        <div class="quota-card-desc">本月免费积分已耗尽，升级标准会员获取 5 倍积分额度、高峰不降速、更多记忆容量。</div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-free">当前：免费用户</span>
+          <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+        </div>
+      </div>
+      <div class="quota-card-footer">
+        <button class="btn-secondary">下月再说</button>
+        <button class="btn-primary">升级会员 · ¥39/月</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="label">▲ 免费用户视角</div>
+<div class="xu-flow" style="margin-top:32px;">
+  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">深度分析一下这份竞品报告的核心论点</div></div></div>
+  <div class="xu-flow-item">
+    <div class="quota-card">
+      <div class="quota-card-body">
+        <div class="quota-card-icon">⚡</div>
+        <div class="quota-card-title">本月积分已用完</div>
+        <div class="quota-card-desc">标准会员积分额度已耗尽。升级高级会员可获得 10 倍积分额度和优先响应。</div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-standard">当前：标准会员</span>
+          <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+        </div>
+      </div>
+      <div class="quota-card-footer">
+        <button class="btn-secondary">等待重置</button>
+        <button class="btn-primary">升级高级会员 · ¥199/月</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="label">▲ 标准会员视角</div>
+</body>
+</html>

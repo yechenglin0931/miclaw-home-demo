@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>桌面通知 — 积分不足</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"MiSans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-weight:330;background:#e8e8e8;padding:40px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center}
+.notif-card{width:344px;border-radius:16px;background:rgba(255,255,255,0.96);backdrop-filter:blur(40px);box-shadow:0 10px 42px rgba(0,0,0,0.16);padding:12px 13px;font-size:13px;border:1px solid rgba(255,255,255,0.36)}
+.notif-header{display:flex;gap:13px;align-items:flex-start}
+.notif-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.55);box-shadow:0 8px 18px rgba(0,0,0,0.14);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-weight:700;font-size:13px;letter-spacing:-0.26px}
+.notif-desc{font-weight:500;font-size:13px;color:rgba(0,0,0,0.85);margin-top:2px;letter-spacing:-0.104px}
+.notif-time{font-size:11px;color:#c6c6c6;flex-shrink:0}
+.notif-actions{display:flex;gap:8px;margin-top:10px}
+.notif-btn{flex:1;height:24px;border-radius:12px;border:none;font-size:13px;font-weight:500;cursor:pointer;text-align:center}
+.notif-btn-primary{background:#0d6fff;color:#fff}
+.notif-btn-secondary{background:rgba(0,0,0,0.05);color:#4c4c4c}
+.label{text-align:center;margin-top:8px;font-size:11px;color:rgba(0,0,0,0.35)}
+</style>
+</head><body>
+<div>
+  <div class="notif-card">
+    <div class="notif-header">
+      <div class="notif-icon">🤖</div>
+      <div class="notif-body"><div class="notif-title">积分不足</div><div class="notif-desc">定时任务「每日科技简报」执行失败，积分已耗尽</div></div>
+      <div class="notif-time">刚刚</div>
+    </div>
+    <div class="notif-actions"><button class="notif-btn notif-btn-secondary">查看详情</button><button class="notif-btn notif-btn-primary">升级会员</button></div>
+  </div>
+  <p class="label">定时任务失败通知</p>
+</div>
+<div>
+  <div class="notif-card">
+    <div class="notif-header">
+      <div class="notif-icon">⚡</div>
+      <div class="notif-body"><div class="notif-title">积分即将用完</div><div class="notif-desc">本月积分已使用 80%，剩余额度较少</div></div>
+      <div class="notif-time">2分钟前</div>
+    </div>
+    <div class="notif-actions"><button class="notif-btn notif-btn-secondary">查看用量</button><button class="notif-btn notif-btn-primary">升级会员</button></div>
+  </div>
+  <p class="label">阈值提醒通知</p>
+</div>
+</body></html>

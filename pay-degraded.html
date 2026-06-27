@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>三方PC — 降级基础模式</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:"MiSans",-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-weight:330;background:#fff;padding:0}
+.xu-flow{max-width:824px;width:100%;padding:0 12px;margin:0 auto;font-size:16px;padding-bottom:8px}
+.xu-flow-item{margin-top:13px}
+.xu-user{display:flex;justify-content:flex-end}
+.xu-user-content{max-width:min(720px,86%);padding:10px 15px;line-height:1.5;border-radius:10px;background:rgba(52,130,255,0.1);color:#000}
+.xu-answer{display:flex;justify-content:flex-start}
+.xu-answer-content{max-width:min(824px,100%);border-radius:10px;background:#fff;color:rgba(0,0,0,0.88);line-height:1.5;padding:10px 15px}
+.degraded-banner{display:flex;align-items:center;gap:8px;padding:6px 12px;margin:8px 12px 0;background:rgba(52,130,255,0.04);border-radius:8px;font-size:12px;color:#636878}
+.degraded-badge{padding:1px 6px;border-radius:4px;background:rgba(52,130,255,0.1);color:#3482ff;font-size:11px;font-weight:500}
+.degraded-upgrade{margin-left:auto;color:#3482ff;font-size:11px;cursor:pointer;font-weight:500}
+.quota-card{width:100%;max-width:480px;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid rgba(0,0,0,0.04)}
+.quota-card-body{padding:14px 18px}
+.quota-card-footer{display:flex;align-items:center;justify-content:flex-end;gap:8px;height:54px;padding:0 16px;border-top:1px solid rgba(0,0,0,0.06);background:#fafafa}
+.btn-primary{height:32px;min-width:72px;border-radius:8px;padding:0 16px;font-size:12px;font-weight:500;color:#fff;background:#3482ff;border:none;cursor:pointer}
+.input-area{padding:12px 16px 16px;border-top:1px solid rgba(0,0,0,0.04)}
+.input-box{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:1px solid #e0e5ec;background:#fff;font-size:14px;color:rgba(0,0,0,0.4)}
+</style>
+</head><body>
+<div class="degraded-banner">
+  <span class="degraded-badge">基础模式</span>
+  <span>当前使用基础模型回复，深度思考和高级功能不可用</span>
+  <span class="degraded-upgrade">升级恢复 →</span>
+</div>
+<div class="xu-flow">
+  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">今天天气怎么样</div></div></div>
+  <div class="xu-flow-item"><div class="xu-answer"><div class="xu-answer-content">今天北京晴，气温 28°C~35°C，适合出行。建议做好防晒。</div></div></div>
+  <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我分析一下公司财报</div></div></div>
+  <div class="xu-flow-item">
+    <div class="quota-card">
+      <div class="quota-card-body">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">🔒</span><span style="font-size:13px;font-weight:520">该功能需要会员积分</span></div>
+        <div style="font-size:12px;color:#636878;margin-top:6px;margin-left:22px">深度分析属于高级功能，升级会员解锁完整能力。基础问答今日剩余 22/30 次。</div>
+      </div>
+      <div class="quota-card-footer"><button class="btn-primary">升级会员</button></div>
+    </div>
+  </div>
+</div>
+<div class="input-area"><div class="input-box"><span>输入消息（基础模式）...</span></div></div>
+</body></html>
