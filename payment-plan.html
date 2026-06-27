@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC MiClaw 付费方案 — 交互原型</title>
+<style>
+/* ===== 设计令牌 — 严格对齐源码 tokens.css ===== */
+:root {
+  --miclaw-color-background: #f6f7fa;
+  --miclaw-color-surface: #ffffff;
+  --miclaw-color-surface-hover: #eef0f5;
+  --miclaw-color-surface-muted: #f2f3f7;
+  --miclaw-color-surface-inset: #e9ebf0;
+  --miclaw-color-text: #1c1f28;
+  --miclaw-color-text-muted: #636878;
+  --miclaw-color-border: #dde0e8;
+  --miclaw-color-border-light: #e9ebf0;
+  --miclaw-color-accent: #3482ff;
+  --miclaw-color-accent-hover: #2b6fe0;
+  --miclaw-color-accent-muted: rgba(52, 130, 255, 0.1);
+  --miclaw-color-danger: #dc2626;
+  --miclaw-color-warning: #d97706;
+  --miclaw-color-success: #16a34a;
+  --miclaw-shell-content-background: #ffffff;
+}
+
+@font-face {
+  font-family: 'MiSans';
+  src: local('MiSans'), local('Xiaomi MiSans'), local('PingFang SC');
+  font-weight: 100 900;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'MiSans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, 'Segoe UI', sans-serif;
+  font-weight: 330;
+  line-height: 1.6;
+  color: var(--miclaw-color-text);
+  background: #1a1d23;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 页面导航 ===== */
+.page-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(26, 29, 35, 0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 12px 32px;
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+.page-nav h1 { color: #fff; font-size: 14px; font-weight: 520; margin-right: 16px; }
+.page-nav a {
+  color: rgba(255,255,255,0.7); font-size: 12px; text-decoration: none;
+  padding: 4px 10px; border-radius: 6px; transition: all 0.15s;
+}
+.page-nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+/* ===== 原型卡片容器 ===== */
+.prototype-section {
+  margin: 80px auto 60px; max-width: 1200px; padding: 0 32px;
+}
+.prototype-section h2 {
+  color: #fff; font-size: 18px; font-weight: 520; margin-bottom: 8px;
+}
+.prototype-section .section-desc {
+  color: rgba(255,255,255,0.5); font-size: 13px; margin-bottom: 24px;
+}
+.prototype-section:first-of-type { margin-top: 80px; }
+
+.prototype-frame {
+  background: var(--miclaw-shell-content-background);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+}
+
+.prototype-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+}
+
+/* ===== 对话流容器（还原 .xu-flow） ===== */
+.xu-flow {
+  max-width: 824px; width: 100%; padding: 0 12px; margin: 22px auto 0;
+  font-size: 16px; font-weight: 400;
+}
+.xu-flow-item { margin-top: 13px; }
+
+/* 用户气泡 */
+.xu-user { display: flex; justify-content: flex-end; }
+.xu-user-content {
+  max-width: min(720px, 86%); padding: 10px 15px; line-height: 1.5;
+  border-radius: 10px; background: rgba(52, 130, 255, 0.1);
+  color: #000; word-break: break-word;
+}
+
+/* 助手气泡 */
+.xu-answer { display: flex; justify-content: flex-start; }
+.xu-answer-content {
+  max-width: min(824px, 100%); border-radius: 10px; background: #fff;
+  color: rgba(0,0,0,0.88); line-height: 1.5; padding: 10px 15px;
+}
+
+/* 系统 card（对齐 .xu-system-card） */
+.xu-system-card {
+  border-radius: 8px; background: rgba(0,0,0,0.035);
+  padding: 8px 10px; color: rgba(0,0,0,0.62); font-size: 13px; line-height: 1.55;
+}
+
+/* ===== 积分耗尽拦截 Card ===== */
+.quota-card {
+  width: 100%; max-width: 540px;
+  border-radius: 20px; background: #fff;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.quota-card-body { padding: 20px 24px 16px; }
+.quota-card-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 12px;
+}
+.quota-card-title {
+  font-size: 15px; font-weight: 520; color: var(--miclaw-color-text);
+  margin-bottom: 6px;
+}
+.quota-card-desc {
+  font-size: 13px; color: var(--miclaw-color-text-muted); line-height: 1.6;
+  margin-bottom: 4px;
+}
+.quota-card-hint {
+  font-size: 12px; color: var(--miclaw-color-success); margin-top: 8px;
+}
+.quota-card-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  height: 54px; padding: 0 16px;
+  border-top: 1px solid rgba(0,0,0,0.06); background: #fafafa;
+}
+.btn-primary {
+  height: 32px; min-width: 72px; border-radius: 8px; padding: 0 16px;
+  font-size: 12px; font-weight: 500; color: #fff;
+  background: #3482ff; border: none; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: #2b6fe0; }
+.btn-secondary {
+  height: 32px; min-width: 72px; border-radius: 8px; padding: 0 16px;
+  font-size: 12px; font-weight: 500; color: rgba(0,0,0,0.8);
+  background: #fff; border: 1px solid rgba(0,0,0,0.1); cursor: pointer;
+}
+
+/* ===== 模型切换面板（还原 ConversationModeSelector xiaoaiInput 样式） ===== */
+.mode-selector-trigger {
+  display: inline-flex; height: 32px; align-items: center; gap: 6px;
+  border-radius: 8px; border: 1px solid #d8e7ff; background: #f5faff;
+  padding: 0 10px; font-size: 12px; color: #3482ff; cursor: pointer;
+}
+.mode-selector-menu {
+  width: 160px; border-radius: 6px; border: 1px solid #edf0f5;
+  background: #fff; padding: 8px 0;
+  box-shadow: 0 12px 30px rgba(31,35,41,0.14);
+}
+.mode-option {
+  display: flex; height: 34px; width: 100%; align-items: center; gap: 8px;
+  padding: 0 12px; font-size: 12px; color: #333b47; cursor: pointer;
+  border: none; background: none; text-align: left;
+}
+.mode-option:hover { background: #f7faff; }
+.mode-option.disabled { opacity: 0.4; cursor: not-allowed; }
+.mode-option .check { color: #1f2329; font-size: 11px; margin-left: auto; }
+.mode-icon { width: 16px; height: 16px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.mode-icon-fast { background: #e8f5e9; color: #2e7d32; }
+.mode-icon-deep { background: #e3f2fd; color: #1565c0; }
+.mode-icon-expert { background: #fce4ec; color: #c62828; }
+
+.mode-upgrade-row {
+  margin-top: 4px; padding: 8px 12px 4px; border-top: 1px solid #edf0f5;
+  font-size: 11px; color: #3482ff; cursor: pointer;
+}
+.mode-upgrade-row:hover { text-decoration: underline; }
+
+/* ===== 阈值 Actionbar 横幅 ===== */
+.threshold-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; margin: 0 12px;
+  background: linear-gradient(90deg, rgba(255,187,15,0.08), rgba(255,187,15,0.03));
+  border: 1px solid rgba(255,187,15,0.3);
+  border-radius: 10px; font-size: 13px; color: #92600a;
+}
+.threshold-bar-icon { font-size: 15px; }
+.threshold-bar-text { flex: 1; }
+.threshold-bar-action {
+  font-size: 12px; color: #3482ff; font-weight: 500; cursor: pointer;
+  white-space: nowrap;
+}
+.threshold-bar-close {
+  width: 18px; height: 18px; border-radius: 4px; border: none;
+  background: none; color: rgba(0,0,0,0.3); cursor: pointer; font-size: 14px;
+}
+
+/* ===== 桌面通知（对齐 AdaptiveNotificationCard macOS 样式） ===== */
+.notif-card {
+  width: 344px; border-radius: 16px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(40px);
+  box-shadow: 0 10px 42px rgba(0,0,0,0.16);
+  padding: 12px 13px; font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.36);
+}
+.notif-header { display: flex; gap: 13px; align-items: flex-start; }
+.notif-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255,255,255,0.55); box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  flex-shrink: 0;
+}
+.notif-body { flex: 1; min-width: 0; }
+.notif-title { font-weight: 700; font-size: 13px; letter-spacing: -0.26px; }
+.notif-desc { font-weight: 500; font-size: 13px; color: rgba(0,0,0,0.85); margin-top: 2px; letter-spacing: -0.104px; }
+.notif-time { font-size: 11px; color: #c6c6c6; flex-shrink: 0; }
+.notif-actions { display: flex; gap: 8px; margin-top: 10px; }
+.notif-btn {
+  flex: 1; height: 24px; border-radius: 12px; border: none;
+  font-size: 13px; font-weight: 500; cursor: pointer; text-align: center;
+}
+.notif-btn-primary { background: #0d6fff; color: #fff; }
+.notif-btn-secondary { background: rgba(0,0,0,0.05); color: #4c4c4c; }
+
+/* ===== 设置页会员区域 ===== */
+.settings-account-card {
+  border-radius: 12px; background: #fff;
+  border: 1px solid var(--miclaw-color-border-light);
+  padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+}
+.settings-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #3482ff; flex-shrink: 0;
+}
+.settings-user-info { flex: 1; min-width: 0; }
+.settings-username { font-size: 15px; font-weight: 520; color: var(--miclaw-color-text); }
+.settings-member-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 4px; padding: 2px 8px; border-radius: 4px;
+  background: linear-gradient(90deg, #f0f7ff, #e8f2ff);
+  font-size: 11px; color: #3482ff; font-weight: 500;
+}
+.settings-manage-btn {
+  font-size: 12px; color: #3482ff; cursor: pointer; font-weight: 500;
+  padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(52,130,255,0.2);
+  background: none;
+}
+.settings-manage-btn:hover { background: rgba(52,130,255,0.04); }
+
+/* ===== 降级状态提示 ===== */
+.degraded-banner {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px; margin: 8px 12px 0;
+  background: rgba(52,130,255,0.04); border-radius: 8px;
+  font-size: 12px; color: var(--miclaw-color-text-muted);
+}
+.degraded-banner-badge {
+  padding: 1px 6px; border-radius: 4px; background: rgba(52,130,255,0.1);
+  color: #3482ff; font-size: 11px; font-weight: 500;
+}
+.degraded-banner-upgrade {
+  margin-left: auto; color: #3482ff; font-size: 11px; cursor: pointer; font-weight: 500;
+}
+
+/* ===== 输入框 ===== */
+.input-area {
+  padding: 12px 16px 16px; border-top: 1px solid rgba(0,0,0,0.04);
+}
+.input-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 12px;
+  border: 1px solid #e0e5ec; background: #fff;
+  font-size: 14px; color: rgba(0,0,0,0.4);
+}
+
+/* ===== 使用进度条 ===== */
+.usage-bar-wrap { padding: 16px 20px; }
+.usage-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--miclaw-color-text-muted); margin-bottom: 6px; }
+.usage-bar { height: 6px; border-radius: 3px; background: #eef0ff; overflow: hidden; }
+.usage-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.usage-bar-fill.low { background: #3482ff; }
+.usage-bar-fill.medium { background: #ffbb0f; }
+.usage-bar-fill.high { background: #ff6251; }
+
+/* ===== 标签 ===== */
+.tag { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; }
+.tag-free { background: rgba(0,0,0,0.04); color: var(--miclaw-color-text-muted); }
+.tag-standard { background: rgba(52,130,255,0.1); color: #3482ff; }
+.tag-premium { background: linear-gradient(90deg, #fff7e1, #ffefc2); color: #92600a; }
+</style>
+</head>
+<body>
+
+<nav class="page-nav">
+  <h1>PC MiClaw 付费方案原型</h1>
+  <a href="#scene1">场景1 对话拦截</a>
+  <a href="#scene2">场景2 路由拦截</a>
+  <a href="#scene3">场景3 模型切换</a>
+  <a href="#scene4">场景4 通知提醒</a>
+  <a href="#scene5">场景5 阈值横幅</a>
+  <a href="#scene6">场景6 中途耗尽</a>
+  <a href="#scene7">场景7 设置页</a>
+  <a href="#scene8">场景8 降级状态</a>
+</nav>
+
+<!-- ===== 场景1：对话拦截 Card（免费 vs 会员） ===== -->
+<section class="prototype-section" id="scene1">
+  <h2>场景 1：专家模式对话 — 积分耗尽拦截 Card</h2>
+  <p class="section-desc">用户发起 query 时服务端返回积分不足，对话流中插入内联拦截 card。区分免费用户 / 会员用户。</p>
+  <div class="prototype-grid">
+    <!-- 免费用户 -->
+    <div class="prototype-frame" style="padding: 24px 0;">
+      <div class="xu-flow">
+        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一份周报，总结本周的工作成果</div></div></div>
+        <div class="xu-flow-item">
+          <div class="quota-card">
+            <div class="quota-card-body">
+              <div class="quota-card-icon">⚡</div>
+              <div class="quota-card-title">积分已用完</div>
+              <div class="quota-card-desc">本月免费积分已耗尽，升级标准会员获取 5 倍积分额度、高峰不降速、更多记忆容量。</div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="tag tag-free">当前：免费用户</span>
+                <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+              </div>
+            </div>
+            <div class="quota-card-footer">
+              <button class="btn-secondary">下月再说</button>
+              <button class="btn-primary">升级会员 · ¥39/月</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:12px;font-size:11px;color:rgba(0,0,0,0.3);">免费用户视角</div>
+    </div>
+    <!-- 会员用户 -->
+    <div class="prototype-frame" style="padding: 24px 0;">
+      <div class="xu-flow">
+        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">深度分析一下这份竞品报告的核心论点</div></div></div>
+        <div class="xu-flow-item">
+          <div class="quota-card">
+            <div class="quota-card-body">
+              <div class="quota-card-icon">⚡</div>
+              <div class="quota-card-title">本月积分已用完</div>
+              <div class="quota-card-desc">标准会员积分额度已耗尽。升级高级会员可获得 10 倍积分额度和优先响应。</div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="tag tag-standard">当前：标准会员</span>
+                <span style="font-size:12px;color:var(--miclaw-color-text-muted);">下次重置：2026-07-21</span>
+              </div>
+            </div>
+            <div class="quota-card-footer">
+              <button class="btn-secondary">等待重置</button>
+              <button class="btn-primary">升级高级会员 · ¥199/月</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:12px;font-size:11px;color:rgba(0,0,0,0.3);">标准会员视角</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景2：自动路由拦截（小米PC） ===== -->
+<section class="prototype-section" id="scene2">
+  <h2>场景 2：自动模式路由拦截 — 仅小米 PC</h2>
+  <p class="section-desc">快系统无法处理，路由到慢系统时发现积分不足，直接展示拦截 card，不让快系统强行回答。</p>
+  <div class="prototype-frame" style="max-width:600px;padding:24px 0;">
+    <div class="xu-flow">
+      <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">把桌面上的产品数据.xlsx 分析一下，找出销量下降的根因</div></div></div>
+      <div class="xu-flow-item">
+        <div class="quota-card">
+          <div class="quota-card-body">
+            <div class="quota-card-icon">🧠</div>
+            <div class="quota-card-title">该问题需要专家模式处理</div>
+            <div class="quota-card-desc">这个任务需要深度分析能力，但当前积分已耗尽。升级会员即可获取答案。</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--miclaw-color-text-muted);">💡 轻量对话（快速模式）仍可正常使用</div>
+          </div>
+          <div class="quota-card-footer">
+            <button class="btn-primary">升级会员</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景3：模型切换面板 ===== -->
+<section class="prototype-section" id="scene3">
+  <h2>场景 3：模型/模式切换 — 置灰 + 升级入口</h2>
+  <p class="section-desc">左：积分充足可切换；右：积分不足，专家模式 / 深度思考置灰，底部增加升级入口。</p>
+  <div class="prototype-grid">
+    <!-- 正常状态 -->
+    <div class="prototype-frame" style="padding:32px 40px;">
+      <p style="font-size:11px;color:rgba(0,0,0,0.4);margin-bottom:12px;">积分充足时</p>
+      <div class="mode-selector-trigger">
+        <span class="mode-icon mode-icon-fast">⚡</span>
+        <span>快速模式</span>
+        <span style="font-size:10px;">▾</span>
+      </div>
+      <div class="mode-selector-menu" style="margin-top:8px;">
+        <button class="mode-option">
+          <span class="mode-icon mode-icon-fast">⚡</span>
+          <span>快速模式</span>
+          <span class="check">✓</span>
+        </button>
+        <button class="mode-option">
+          <span class="mode-icon mode-icon-deep">🔍</span>
+          <span>深度思考</span>
+        </button>
+        <button class="mode-option">
+          <span class="mode-icon mode-icon-expert">🎯</span>
+          <span>专家模式</span>
+        </button>
+      </div>
+    </div>
+    <!-- 积分不足 -->
+    <div class="prototype-frame" style="padding:32px 40px;">
+      <p style="font-size:11px;color:rgba(0,0,0,0.4);margin-bottom:12px;">积分耗尽时</p>
+      <div class="mode-selector-trigger" style="opacity:0.6;">
+        <span class="mode-icon mode-icon-fast">⚡</span>
+        <span>快速模式</span>
+        <span style="font-size:10px;">▾</span>
+      </div>
+      <div class="mode-selector-menu" style="margin-top:8px;">
+        <button class="mode-option">
+          <span class="mode-icon mode-icon-fast">⚡</span>
+          <span>快速模式</span>
+          <span class="check">✓</span>
+        </button>
+        <button class="mode-option disabled" title="积分不足">
+          <span class="mode-icon mode-icon-deep">🔍</span>
+          <span>深度思考</span>
+          <span style="font-size:10px;color:#d97706;margin-left:auto;">需积分</span>
+        </button>
+        <button class="mode-option disabled" title="积分不足">
+          <span class="mode-icon mode-icon-expert">🎯</span>
+          <span>专家模式</span>
+          <span style="font-size:10px;color:#d97706;margin-left:auto;">需积分</span>
+        </button>
+        <div class="mode-upgrade-row">升级会员 →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景4：桌面通知 ===== -->
+<section class="prototype-section" id="scene4">
+  <h2>场景 4：桌面通知 — 定时任务失败 / 阈值提醒</h2>
+  <p class="section-desc">macOS 风格通知卡片（对齐 AdaptiveNotificationCard），带操作按钮。</p>
+  <div class="prototype-grid">
+    <!-- 定时任务失败 -->
+    <div style="padding:20px;display:flex;justify-content:center;">
+      <div class="notif-card">
+        <div class="notif-header">
+          <div class="notif-icon">🤖</div>
+          <div class="notif-body">
+            <div class="notif-title">积分不足</div>
+            <div class="notif-desc">定时任务「每日科技简报」执行失败，积分已耗尽</div>
+          </div>
+          <div class="notif-time">刚刚</div>
+        </div>
+        <div class="notif-actions">
+          <button class="notif-btn notif-btn-secondary">查看详情</button>
+          <button class="notif-btn notif-btn-primary">升级会员</button>
+        </div>
+      </div>
+    </div>
+    <!-- 阈值提醒 -->
+    <div style="padding:20px;display:flex;justify-content:center;">
+      <div class="notif-card">
+        <div class="notif-header">
+          <div class="notif-icon">⚡</div>
+          <div class="notif-body">
+            <div class="notif-title">积分即将用完</div>
+            <div class="notif-desc">本月积分已使用 80%，剩余额度较少</div>
+          </div>
+          <div class="notif-time">2 分钟前</div>
+        </div>
+        <div class="notif-actions">
+          <button class="notif-btn notif-btn-secondary">查看用量</button>
+          <button class="notif-btn notif-btn-primary">升级会员</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景5：对话内阈值横幅 ===== -->
+<section class="prototype-section" id="scene5">
+  <h2>场景 5：对话内阈值提醒 — 输入框上方 Actionbar</h2>
+  <p class="section-desc">积分接近阈值时在输入框上方出现横幅提醒，可关闭。</p>
+  <div class="prototype-frame" style="max-width:600px;padding:0;">
+    <div class="xu-flow" style="padding-bottom:8px;">
+      <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一段会议纪要</div></div></div>
+      <div class="xu-flow-item"><div class="xu-answer"><div class="xu-answer-content">好的，我来帮你整理会议纪要。请问会议的主题是什么？有哪些参会人员？主要讨论了哪些议题？</div></div></div>
+    </div>
+    <div class="threshold-bar">
+      <span class="threshold-bar-icon">⚡</span>
+      <span class="threshold-bar-text">积分即将用完（剩余 18%），升级获取更多额度</span>
+      <span class="threshold-bar-action">升级会员</span>
+      <button class="threshold-bar-close">×</button>
+    </div>
+    <div class="input-area">
+      <div class="input-box">
+        <span>输入消息...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景6：中途耗尽（宽容模式） ===== -->
+<section class="prototype-section" id="scene6">
+  <h2>场景 5（PRD）：生成中途积分耗尽 — 宽容模式</h2>
+  <p class="section-desc">允许本次回答完成输出，结束后追加积分耗尽 card。下次 query 正式拦截。</p>
+  <div class="prototype-frame" style="max-width:600px;padding:24px 0;">
+    <div class="xu-flow">
+      <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我分析这份市场报告的核心数据趋势</div></div></div>
+      <div class="xu-flow-item"><div class="xu-answer"><div class="xu-answer-content">根据报告数据，有以下核心趋势：<br><br>1. <b>用户增长</b>：Q2 月活达到 2.3 亿，环比增长 12%<br>2. <b>营收结构</b>：IoT 业务占比提升至 28%，首次超过手机互联网业务<br>3. <b>海外市场</b>：印度和欧洲市场贡献了 45% 的增量...</div></div></div>
+      <div class="xu-flow-item">
+        <div class="quota-card" style="max-width:480px;">
+          <div class="quota-card-body" style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:14px;">⚡</span>
+              <span style="font-size:13px;font-weight:520;">本次回答已完成，积分已耗尽</span>
+            </div>
+            <div style="font-size:12px;color:var(--miclaw-color-text-muted);margin-top:6px;margin-left:22px;">下次对话将正式拦截。升级会员获取更多积分继续使用。</div>
+          </div>
+          <div class="quota-card-footer">
+            <button class="btn-primary">升级会员</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景7：设置页会员展示 ===== -->
+<section class="prototype-section" id="scene7">
+  <h2>设置页 — 账号区域会员身份展示</h2>
+  <p class="section-desc">设置页账号区域增加会员身份标识 + 积分进度条 + 管理订阅入口。</p>
+  <div class="prototype-frame" style="max-width:560px;padding:24px;">
+    <div class="settings-account-card">
+      <div class="settings-avatar">👤</div>
+      <div class="settings-user-info">
+        <div class="settings-username">叶成林</div>
+        <div class="settings-member-badge">⭐ 标准会员 · 有效期至 2026-07-21</div>
+      </div>
+      <button class="settings-manage-btn">管理订阅</button>
+    </div>
+    <div class="usage-bar-wrap">
+      <div class="usage-bar-label">
+        <span>本月用量</span>
+        <span>已使用 72% · 重置时间 2026-07-21</span>
+      </div>
+      <div class="usage-bar">
+        <div class="usage-bar-fill medium" style="width:72%;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 场景8：三方 PC 降级状态 ===== -->
+<section class="prototype-section" id="scene8">
+  <h2>三方 PC/Mac — 降级基础模式状态</h2>
+  <p class="section-desc">积分耗尽后降级为基础模型，对话不中断但功能受限。顶部横幅提示当前状态。</p>
+  <div class="prototype-frame" style="max-width:600px;padding:0;">
+    <div class="degraded-banner">
+      <span class="degraded-banner-badge">基础模式</span>
+      <span>当前使用基础模型回复，深度思考和高级功能不可用</span>
+      <span class="degraded-banner-upgrade">升级恢复 →</span>
+    </div>
+    <div class="xu-flow" style="padding-bottom:8px;">
+      <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">今天天气怎么样</div></div></div>
+      <div class="xu-flow-item"><div class="xu-answer"><div class="xu-answer-content">今天北京晴，气温 28°C~35°C，适合出行。建议做好防晒。</div></div></div>
+      <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我分析一下公司财报</div></div></div>
+      <div class="xu-flow-item">
+        <div class="quota-card" style="max-width:480px;">
+          <div class="quota-card-body" style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:14px;">🔒</span>
+              <span style="font-size:13px;font-weight:520;">该功能需要会员积分</span>
+            </div>
+            <div style="font-size:12px;color:var(--miclaw-color-text-muted);margin-top:6px;margin-left:22px;">深度分析属于高级功能，升级会员解锁完整能力。基础问答今日剩余 22/30 次。</div>
+          </div>
+          <div class="quota-card-footer">
+            <button class="btn-primary">升级会员</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-box">
+        <span>输入消息（基础模式）...</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div style="height:80px;"></div>
+</body>
+</html>
