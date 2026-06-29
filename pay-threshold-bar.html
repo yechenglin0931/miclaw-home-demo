@@ -1,44 +1,31 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>对话内阈值横幅</title>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>对话内阈值横幅</title>
 <style>
-:root{--bg:#f6f7fa;--surface:#fff;--text:#1c1f28;--text-muted:#636878;--border:#e9ebf0;--accent:#3482ff}
-*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{margin:0;padding:*{marg33}*{margin:0;padding:*{margin:0;padding:*{margin:0;pa--accent)}
-.sidebar-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.titlebar{height:48px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:520}
-.chat-area{flex:1;overflow-y:auto;padding:24px 0}
-.xu-flow{max-width:824px;width:100%;padding:0 24px;margin:0 auto;font-size:16px}
-.xu-flow-item{margin-top:16px}
-.xu-user{display:flex;justify-content:flex-end}
-.xu-user-content{max-width:min(600px,80%);padding:10px 15px;border-radius:10px;background:rgba(52,130,255,0.1);color:#000;line-height:1.5}
-.xu-answer{display:flex;justify-content:flex-start}
-.xu-answer-content{max-width:min(824px,100%);border-radius:10px;background:#fff;color:rgba(0,0,0,0.88);line-height:1.5;padding:10px 15px}
-.threshold-bar{display:flex;align-items:center;gap:10px;padding:8px 16px;margin:0 24px;background:linear-gradient(90deg,rgba(255,187,15,0.08),rgba(255,187,15,0.03));border:1px solid rgba(255,187,15,0.3);border-radius:10px;font-size:13px;color:#92600a}
-.threshold-bar-action{font-size:12px;color:var(--accent);font-weight:500;cursor:pointer;white-space:nowrap}
-.threshold-bar-close{width:18px;height:18px;border-radius:4px;border:none;background:none;color:rgba(0,0,0,0.3);cursor:pointer;font-size:14px}
-.input-area{padding:12px 24px 16px;border-top:1px solid rgba(0,0,0,0.04)}
-.input-box{display:flex;align-items:center;padding:12px 16px;border-radius:12px;border:1px solid #e0e5ec;background:#fff;font-size:14px;color:rgba(0,0,0,0.35)}
+:root { --text: #1c1f28; --text-muted: #636878; --accent: #3482ff; --border: #e9ebf0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'MiSans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; font-weight: 330; line-height: 1.6; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; padding: 32px; }
+.scene-label { text-align: center; padding: 8px; font-size: 11px; color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.02); border-radius: 6px; margin-bottom: 16px; margin-top: 24px; }
+.scene-label:first-child { margin-top: 0; }
+
+body { background: #fff; padding: 0; max-width: 700px; margin: 0 auto; }
+.chat { padding: 24px 24px 8px; }
+.user { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.user-bubble { padding: 10px 15px; border-radius: 10px; background: rgba(52,130,255,0.1); font-size: 16px; max-width: 80%; }
+.answer { padding: 10px 15px; border-radius: 10px; background: #fff; font-size: 16px; color: rgba(0,0,0,0.88); margin-bottom: 16px; }
+.threshold-bar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; margin: 0 24px; background: linear-gradient(90deg, rgba(255,187,15,0.08), rgba(255,187,15,0.03)); border: 1px solid rgba(255,187,15,0.3); border-radius: 10px; font-size: 13px; color: #92600a; }
+.bar-action { font-size: 12px; color: var(--accent); font-weight: 500; cursor: pointer; white-space: nowrap; }
+.bar-close { width: 18px; height: 18px; border: none; background: none; color: rgba(0,0,0,0.3); cursor: pointer; font-size: 14px; }
+.input-area { padding: 12px 24px 16px; border-top: 1px solid rgba(0,0,0,0.04); }
+.input-box { display: flex; align-items: center; padding: 12px 16px; border-radius: 12px; border: 1px solid #e0e5ec; font-size: 14px; color: rgba(0,0,0,0.35); }
 </style></head><body>
-<div class="shell">
-  <aside class="sidebar">
-    <div class="sidebar-item active"><span class="sidebar-icon">💬</span>新对话</div>
-    <div class="sidebar-item"><span class="sidebar-icon">🔗</span>设备协作</div>
-    <div class="sidebar-item"><span class="sidebar-icon">📁</span>资料</div>
-  </aside>
-  <main class="main">
-    <div class="titlebar">超级小爱</div>
-    <div class="chat-area">
-      <div class="xu-flow">
-        <div class="xu-flow-item"><div class="xu-user"><div class="xu-user-content">帮我写一段会议纪要</div></div></div>
-        <div class="xu-flow-item"><div class="xu-answer"><div class="xu-answer-content">好的，我来帮你整理会议纪要。请问会议的主题是什么？有哪些参会人员？主要讨论了哪些议题？</div></div></div>
-      </div>
-    </div>
-    <div class="threshold-bar">
-      <span>⚡</span>
-      <span style="flex:1">本月积分剩余不足 20%，升级可获取更多积分</span>
-      <span class="threshold-bar-action">升级标准会员</span>
-      <button class="threshold-bar-close">×</button>
-    </div>
-    <div class="input-area"><div class="input-box">输入消息...</div></div>
-  </main>
+<div class="chat">
+  <div class="user"><div class="user-bubble">帮我写一段会议纪要</div></div>
+  <div class="answer">好的，我来帮你整理会议纪要。请问会议的主题是什么？有哪些参会人员？主要讨论了哪些议题？</div>
 </div>
+<div class="threshold-bar">
+  <span>⚡</span>
+  <span style="flex:1">本月积分剩余不足 20%，升级可获取更多积分</span>
+  <span class="bar-action">升级标准会员</span>
+  <button class="bar-close">×</button>
+</div>
+<div class="input-area"><div class="input-box">输入消息...</div></div>
 </body></html>

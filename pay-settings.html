@@ -1,24 +1,29 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>设置页 — 会员身份展示</title>
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>设置页 — 会员身份展示</title>
 <style>
-:root{--bg:#f6f7fa;--surface:#fff;--text:#1c1f28;--text-muted:#636878;--border:#e9ebf0;--accent:#3482ff}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'MiSans',-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;font-weight:330;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;height:100vh;display:flex}
-.shell{display:flex;flex:1;overflow:hidden;border-radius:8px;margin:8px;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-.settings-nav{width:200px;background:#fff;border-right:1px solid var(--border);padding:56px 12px 16px;flex-shrink:0}
-.nav-item{display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-size:13px;font-w.nav-item{display:block;width:100%;text-align:left;padding:8px 12:no.nav-item{display:block;width:100%;tex{background:rgba(0,0,0,0.06);color:var(--accent)}
-.settings-content{flex:1;padding:56px 32px 32px;overflow-y:auto}
-.settings-title{font-size:20px;font-weight:520;margin-bottom:24px}
-.account-card{border-radius:16px;background:#fff;border:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px}
-.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);flex-shrink:0}
-.user-info{flex:1;min-width:0}
-.username{font-size:16px;font-weight:520}
-.member-badge{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:3px 10px;border-radius:6px;background:linear-gradient(90deg,#f0f7ff,#e8f2ff);font-size:12px;color:var(--accent);font-weight:500}
-.manage-btn{font-size:13px;color:var(--accent);cursor:pointer;font-weight:500;padding:8px 14px;border-radius:8px;border:1px solid rgba(52,130,255,0.2);background:none}
-.usage-section{margin-top:16px;padding:16px 24px;background:#fff;border-radius:16px;border:1px solid var(--border)}
-.usage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.usage-label{font-size:13px;color:var(--text-muted)}
-.usage-bar{height:6px;border-radius:3px;background:#eef0ff;overflow:hidden}
-.usage-fill{height:100%;border-radius:3px;background:#ffbb0f;width:72%}
+:root { --text: #1c1f28; --text-muted: #636878; --accent: #3482ff; --border: #e9ebf0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'MiSans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif; font-weight: 330; line-height: 1.6; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; padding: 32px; }
+.scene-label { text-align: center; padding: 8px; font-size: 11px; color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.02); border-radius: 6px; margin-bottom: 16px; margin-top: 24px; }
+.scene-label:first-child { margin-top: 0; }
+
+body { background: #f6f7fa; padding: 0; height: 100vh; display: flex; }
+.shell { display: flex; flex: 1; overflow: hidden; border-radius: 8px; margin: 8px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.settings-nav { width: 200px; background: #fff; border-right: 1px solid var(--border); padding: 56px 12px 16px; flex-shrink: 0; }
+.nav-item { display: block; width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; border: none; background: none; margin-bottom: 2px; }
+.nav-item.active { background: rgba(0,0,0,0.06); color: var(--accent); }
+.settings-content { flex: 1; padding: 56px 32px 32px; overflow-y: auto; }
+.settings-title { font-size: 20px; font-weight: 520; margin-bottom: 24px; }
+.account-card { border-radius: 16px; background: #fff; border: 1px solid var(--border); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--accent); flex-shrink: 0; }
+.user-info { flex: 1; min-width: 0; }
+.username { font-size: 16px; font-weight: 520; }
+.member-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 10px; border-radius: 6px; background: linear-gradient(90deg, #f0f7ff, #e8f2ff); font-size: 12px; color: var(--accent); font-weight: 500; }
+.manage-btn { font-size: 13px; color: var(--accent); font-weight: 500; padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(52,130,255,0.2); background: none; cursor: pointer; }
+.usage-section { margin-top: 16px; padding: 16px 24px; background: #fff; border-radius: 16px; border: 1px solid var(--border); }
+.usage-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.usage-label { font-size: 13px; color: var(--text-muted); }
+.usage-bar { height: 6px; border-radius: 3px; background: #eef0ff; overflow: hidden; }
+.usage-fill { height: 100%; border-radius: 3px; background: #ffbb0f; width: 72%; }
 </style></head><body>
 <div class="shell">
   <nav class="settings-nav">
